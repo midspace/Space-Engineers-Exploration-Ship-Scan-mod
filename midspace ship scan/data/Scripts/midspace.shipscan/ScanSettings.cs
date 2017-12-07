@@ -27,7 +27,7 @@
                 IgnoreEntityId = new List<long>(),
                 TrackEntites = new List<TrackEntity>()
             };
-            _settingsFileName = string.Format("ScanSettings_{0}.cfg", Path.GetFileNameWithoutExtension(MyAPIGateway.Session.CurrentPath));
+            _settingsFileName = $"ScanSettings_{Path.GetFileNameWithoutExtension(MyAPIGateway.Session.CurrentPath)}.cfg";
         }
 
         public void Save()
@@ -67,7 +67,7 @@
                 }
                 catch (Exception ex)
                 {
-                    VRage.Utils.MyLog.Default.WriteLine(string.Format("#### ShipScan LoadData from file '{0}' failed: {1}", _settingsFileName, ex));
+                    VRage.Utils.MyLog.Default.WriteLine($"#### ShipScan LoadData from file '{_settingsFileName}' failed: {ex}");
                 }
             }
         }

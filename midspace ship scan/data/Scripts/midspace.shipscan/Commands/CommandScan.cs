@@ -24,16 +24,16 @@
         public readonly static List<TrackDetail> ShipCache = new List<TrackDetail>();
 
         public CommandScan()
-            : base(ChatCommandSecurity.User, "scan", new[] { "/scan", "/scan2", "/scan3" })
+            : base(ChatCommandSecurity.User, ChatCommandAccessibility.Client, "scan", new[] { "/scan", "/scan2", "/scan3" })
         {
         }
 
-        public override void Help()
+        public override void Help(ulong steamId, bool brief)
         {
             MyAPIGateway.Utilities.ShowMessage("/scan", "Scans for derelict ships using ship antenna.");
         }
 
-        public override bool Invoke(string messageText)
+        public override bool Invoke(ulong steamId, long playerId, string messageText)
         {
             double minRange = 0;
             var match = Regex.Match(messageText, @"/scan\s{1,}(?<MINRANGE>[+-]?((\d+(\.\d*)?)|(\.\d+)))", RegexOptions.IgnoreCase);
@@ -41,7 +41,7 @@
             {
                 minRange = double.Parse(match.Groups["MINRANGE"].Value, CultureInfo.InvariantCulture);
                 if (minRange <= 0) minRange = 0;
-                return ScanShips(minRange, ScanType.MissionScreen);
+                return ScanShips(steamId, minRange, ScanType.MissionScreen);
             }
 
             match = Regex.Match(messageText, @"/scan2\s{1,}(?<MINRANGE>[+-]?((\d+(\.\d*)?)|(\.\d+)))", RegexOptions.IgnoreCase);
@@ -49,7 +49,7 @@
             {
                 minRange = double.Parse(match.Groups["MINRANGE"].Value, CultureInfo.InvariantCulture);
                 if (minRange <= 0) minRange = 0;
-                return ScanShips(minRange, ScanType.ChatConsole);
+                return ScanShips(steamId, minRange, ScanType.ChatConsole);
             }
 
             match = Regex.Match(messageText, @"/scan3\s{1,}(?<MINRANGE>[+-]?((\d+(\.\d*)?)|(\.\d+)))", RegexOptions.IgnoreCase);
@@ -57,26 +57,26 @@
             {
                 minRange = double.Parse(match.Groups["MINRANGE"].Value, CultureInfo.InvariantCulture);
                 if (minRange <= 0) minRange = 0;
-                return ScanShips(minRange, ScanType.GPSCoordinates);
+                return ScanShips(steamId, minRange, ScanType.GPSCoordinates);
             }
 
             if (messageText.Equals("/scan", StringComparison.InvariantCultureIgnoreCase))
             {
-                return ScanShips(0, ScanType.MissionScreen);
+                return ScanShips(steamId, 0, ScanType.MissionScreen);
             }
             if (messageText.Equals("/scan2", StringComparison.InvariantCultureIgnoreCase))
             {
-                return ScanShips(0, ScanType.ChatConsole);
+                return ScanShips(steamId, 0, ScanType.ChatConsole);
             }
             if (messageText.Equals("/scan3", StringComparison.InvariantCultureIgnoreCase))
             {
-                return ScanShips(0, ScanType.GPSCoordinates);
+                return ScanShips(steamId, 0, ScanType.GPSCoordinates);
             }
 
             return false;
         }
 
-        private bool ScanShips(double minRange, ScanType displayType)
+        private bool ScanShips(ulong steamId, double minRange, ScanType displayType)
         {
             // TODO: background progessing. GetEntitiesInSphere is a very intensive call.
             //MyAPIGateway.Parallel.
@@ -186,7 +186,7 @@
                     fullCount = shipGrids.Count;
 
                     // Filter the ignore list.
-                    var config = ChatCommandLogicShipScan.Instance.Settings.Config;
+                    var config = MainChatCommandLogic.Instance.Settings.Config;
                     shipGrids = shipGrids.Where(e => !(config.IgnoreJunk && e.MassCategory == MassCategory.Junk)).ToList();
                     shipGrids = shipGrids.Where(e => !(config.IgnoreTiny && e.MassCategory == MassCategory.Tiny)).ToList();
                     shipGrids = shipGrids.Where(e => !(config.IgnoreSmall && e.MassCategory == MassCategory.Small)).ToList();
@@ -238,8 +238,8 @@
 
                     case ScanType.GPSCoordinates:
                         {
-                            if (ChatCommandLogicShipScan.Instance.Settings.Config.TrackEntites == null)
-                                ChatCommandLogicShipScan.Instance.Settings.Config.TrackEntites = new List<TrackEntity>();
+                            if (MainChatCommandLogic.Instance.Settings.Config.TrackEntites == null)
+                                MainChatCommandLogic.Instance.Settings.Config.TrackEntites = new List<TrackEntity>();
 
                             var updateCount = 0;
                             foreach (var ship in shipGrids)
@@ -248,10 +248,10 @@
 
                                 foreach (var entityId in entityIds)
                                 {
-                                    var trackEntity = ChatCommandLogicShipScan.Instance.Settings.Config.TrackEntites.FirstOrDefault(t => t.Entities.Contains(entityId));
+                                    var trackEntity = MainChatCommandLogic.Instance.Settings.Config.TrackEntites.FirstOrDefault(t => t.Entities.Contains(entityId));
                                     if (trackEntity.GpsHash != 0)
                                     {
-                                        ChatCommandLogicShipScan.Instance.Settings.Config.TrackEntites.Remove(trackEntity);
+                                        MainChatCommandLogic.Instance.Settings.Config.TrackEntites.Remove(trackEntity);
                                         //MyAPIGateway.Session.GPS.RemoveLocalGps(trackEntity.GpsHash);
                                         MyAPIGateway.Session.GPS.RemoveGps(MyAPIGateway.Session.Player.IdentityId, trackEntity.GpsHash);
                                         updateCount++;
@@ -267,10 +267,10 @@
 
                                 //MyAPIGateway.Session.GPS.AddLocalGps(gps);
                                 MyAPIGateway.Session.GPS.AddGps(MyAPIGateway.Session.Player.IdentityId, gps);
-                                ChatCommandLogicShipScan.Instance.Settings.Config.TrackEntites.Add(new TrackEntity { GpsHash = gps.Hash, Entities = ship.GridGroups.Select(e => e.EntityId).ToList() });
+                                MainChatCommandLogic.Instance.Settings.Config.TrackEntites.Add(new TrackEntity { GpsHash = gps.Hash, Entities = ship.GridGroups.Select(e => e.EntityId).ToList() });
                             }
 
-                            ChatCommandLogicShipScan.Instance.Settings.Save();
+                            MainChatCommandLogic.Instance.Settings.Save();
                             MyAPIGateway.Utilities.ShowMessage("Scan range", "{0}m : {1}/{2} new derelict masses detected.", effetiveRadius, shipGrids.Count - updateCount, shipGrids.Count);
                         }
                         break;

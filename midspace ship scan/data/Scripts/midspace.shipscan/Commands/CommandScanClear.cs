@@ -5,26 +5,26 @@
     public class CommandScanClear : ChatCommand
     {
         public CommandScanClear()
-            : base(ChatCommandSecurity.User, "scanclear", new[] { "/scanclear" })
+            : base(ChatCommandSecurity.User, ChatCommandAccessibility.Client, "scanclear", new[] { "/scanclear" })
         {
         }
 
-        public override void Help()
+        public override void Help(ulong steamId, bool brief)
         {
             MyAPIGateway.Utilities.ShowMessage("/scanclear", "Will remove all currently displayed scanned GPS coordinates.");
         }
 
-        public override bool Invoke(string messageText)
+        public override bool Invoke(ulong steamId, long playerId, string messageText)
         {
-            if (ChatCommandLogicShipScan.Instance.Settings.Config.TrackEntites == null)
+            if (MainChatCommandLogic.Instance.Settings.Config.TrackEntites == null)
                 return true;
 
-            foreach (var trackEntity in ChatCommandLogicShipScan.Instance.Settings.Config.TrackEntites)
+            foreach (var trackEntity in MainChatCommandLogic.Instance.Settings.Config.TrackEntites)
             {
                 MyAPIGateway.Session.GPS.RemoveGps(MyAPIGateway.Session.Player.IdentityId, trackEntity.GpsHash);
             }
 
-            ChatCommandLogicShipScan.Instance.Settings.Config.TrackEntites.Clear();
+            MainChatCommandLogic.Instance.Settings.Config.TrackEntites.Clear();
 
             return true;
         }

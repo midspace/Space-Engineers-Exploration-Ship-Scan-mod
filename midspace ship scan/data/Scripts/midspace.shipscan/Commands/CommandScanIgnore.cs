@@ -8,13 +8,13 @@
     public class CommandScanIgnore : ChatCommand
     {
         public CommandScanIgnore()
-            : base(ChatCommandSecurity.User, "ignore", new[] { "/ignore" })
+            : base(ChatCommandSecurity.User, ChatCommandAccessibility.Client, "ignore", new[] { "/ignore" })
         {
         }
 
-        public override void Help()
+        public override void Help(ulong steamId, bool brief)
         {
-            var config = ChatCommandLogicShipScan.Instance.Settings.Config;
+            var config = MainChatCommandLogic.Instance.Settings.Config;
             var ignoreList = new List<string>();
             if (config.IgnoreJunk) ignoreList.Add(MassCategory.Junk.ToString());
             if (config.IgnoreTiny) ignoreList.Add(MassCategory.Tiny.ToString());
@@ -44,12 +44,12 @@ Currently Ignoring: {0}
             MyAPIGateway.Utilities.ShowMissionScreen("/Ignore Help", null, " ", description, null, "OK");
         }
 
-        public override bool Invoke(string messageText)
+        public override bool Invoke(ulong steamId, long playerId, string messageText)
         {
             var commands = messageText.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
             if (commands.Length < 3)
             {
-                Help();
+                Help(steamId, false);
                 return true;
             }
 
@@ -76,7 +76,7 @@ Currently Ignoring: {0}
 
             if (massclass == null)
             {
-                Help();
+                Help(steamId, false);
                 return true;
             }
 
@@ -94,24 +94,24 @@ Currently Ignoring: {0}
 
             if (!setIgnore.HasValue)
             {
-                Help();
+                Help(steamId, false);
                 return true;
             }
 
             if (massclass == MassCategory.Junk.ToString())
-                ChatCommandLogicShipScan.Instance.Settings.Config.IgnoreJunk = setIgnore.Value;
+                MainChatCommandLogic.Instance.Settings.Config.IgnoreJunk = setIgnore.Value;
             if (massclass == MassCategory.Tiny.ToString())
-                ChatCommandLogicShipScan.Instance.Settings.Config.IgnoreTiny = setIgnore.Value;
+                MainChatCommandLogic.Instance.Settings.Config.IgnoreTiny = setIgnore.Value;
             if (massclass == MassCategory.Small.ToString())
-                ChatCommandLogicShipScan.Instance.Settings.Config.IgnoreSmall = setIgnore.Value;
+                MainChatCommandLogic.Instance.Settings.Config.IgnoreSmall = setIgnore.Value;
             if (massclass == MassCategory.Large.ToString())
-                ChatCommandLogicShipScan.Instance.Settings.Config.IgnoreLarge = setIgnore.Value;
+                MainChatCommandLogic.Instance.Settings.Config.IgnoreLarge = setIgnore.Value;
             if (massclass == MassCategory.Huge.ToString())
-                ChatCommandLogicShipScan.Instance.Settings.Config.IgnoreHuge = setIgnore.Value;
+                MainChatCommandLogic.Instance.Settings.Config.IgnoreHuge = setIgnore.Value;
             if (massclass == MassCategory.Enormous.ToString())
-                ChatCommandLogicShipScan.Instance.Settings.Config.IgnoreEnormous = setIgnore.Value;
+                MainChatCommandLogic.Instance.Settings.Config.IgnoreEnormous = setIgnore.Value;
             if (massclass == MassCategory.Ridiculous.ToString())
-                ChatCommandLogicShipScan.Instance.Settings.Config.IgnoreRidiculous = setIgnore.Value;
+                MainChatCommandLogic.Instance.Settings.Config.IgnoreRidiculous = setIgnore.Value;
 
             MyAPIGateway.Utilities.ShowMessage(string.Format("Ignore {0}", massclass), setIgnore.Value ? "On" : "Off");
 

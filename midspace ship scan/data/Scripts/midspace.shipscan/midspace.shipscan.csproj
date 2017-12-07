@@ -83,19 +83,33 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ChatCommandService.cs" />
+    <Compile Include="ClientConfig.cs" />
+    <Compile Include="ModFramework\Messages\MessageChatCommand.cs" />
+    <Compile Include="ModFramework\Messages\MessageClientDialogMessage.cs" />
+    <Compile Include="ModFramework\Messages\MessageClientNotification.cs" />
+    <Compile Include="ModFramework\Messages\MessageClientTextMessage.cs" />
+    <Compile Include="Messages\MessageTest.cs" />
+    <Compile Include="ModFramework\ChatCommandService.cs" />
     <Compile Include="Commands\CommandScanClear.cs" />
     <Compile Include="Commands\CommandScanIgnore.cs" />
     <Compile Include="Commands\CommandScanTrack.cs" />
+    <Compile Include="ModFramework\ConnectionHelper.cs" />
+    <Compile Include="ModFramework\Messages\MessageConnectionRequest.cs" />
+    <Compile Include="ModFramework\Messages\MessageConnectionResponse.cs" />
+    <Compile Include="ModFramework\ModMessageBase.cs" />
+    <Compile Include="Messages\ModMessageBaseList.cs" />
     <Compile Include="ScanSettings.cs" />
     <Compile Include="ShipGrid.cs" />
     <Compile Include="Commands\CommandScan.cs" />
-    <Compile Include="Extensions.cs" />
-    <Compile Include="Commands\ChatCommand.cs" />
+    <Compile Include="ModFramework\Extensions.cs" />
+    <Compile Include="ModFramework\ChatCommand.cs" />
     <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="ChatCommandLogicShipScan.cs" />
+    <Compile Include="MainChatCommandLogic.cs" />
+    <Compile Include="ModConfigurationConsts.cs" />
     <Compile Include="ShipScanConsts.cs" />
+    <Compile Include="ProgrammableBlockLogic.cs" />
     <Compile Include="Support.cs" />
+    <Compile Include="ModFramework\TextLogger.cs" />
     <Compile Include="TrackDetail.cs" />
   </ItemGroup>
   <ItemGroup>

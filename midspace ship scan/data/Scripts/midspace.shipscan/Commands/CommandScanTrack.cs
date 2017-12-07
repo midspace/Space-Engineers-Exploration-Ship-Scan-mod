@@ -5,7 +5,7 @@
     using System.Text.RegularExpressions;
     using VRage.Game;
     using VRage.Game.ModAPI;
-    using IMyControllableEntity = VRage.Game.ModAPI.Interfaces.IMyControllableEntity;
+    using VRage.Game.ModAPI.Interfaces;
 
     public class CommandScanTrack : ChatCommand
     {
@@ -15,16 +15,16 @@
         private IMyControllableEntity _currentController;
 
         public CommandScanTrack()
-            : base(ChatCommandSecurity.User, "track", new[] { "/track" })
+            : base(ChatCommandSecurity.User, ChatCommandAccessibility.Client, "track", new[] { "/track" })
         {
         }
 
-        public override void Help()
+        public override void Help(ulong steamId, bool brief)
         {
             MyAPIGateway.Utilities.ShowMessage("/track <#>", "Tracking a scanned derelict ship.");
         }
 
-        public override bool Invoke(string messageText)
+        public override bool Invoke(ulong steamId, long playerId, string messageText)
         {
             var match = Regex.Match(messageText, @"/track\s{1,}(?<Key>.+)", RegexOptions.IgnoreCase);
 
@@ -48,7 +48,7 @@
                 _track = detail;
                 _currentController = MyAPIGateway.Session.Player.Controller.ControlledEntity;
                 _isTracking = true;
-                Init();
+                InitHudObjective();
                 MyAPIGateway.Utilities.ShowMessage("Tracking", "object '{0}'.", _track.Title);
                 return true;
             }
@@ -64,30 +64,36 @@
             return false;
         }
 
-        public override void UpdateBeforeSimulation1000()
+        public override void UpdateBeforeSimulation100()
         {
-            base.UpdateBeforeSimulation1000();
             ProcessPosition();
         }
 
-        private bool Init()
+        private void InitHudObjective()
         {
             IMyHudObjectiveLine objective = MyAPIGateway.Utilities.GetObjectiveLine();
             objective.Title = _track.Title;
             objective.Objectives.Clear();
             objective.Objectives.Add("");
             objective.Show();
-            return true;
         }
 
         private void Unload()
         {
             if (MyAPIGateway.Session != null)
             {
-                IMyHudObjectiveLine objective = MyAPIGateway.Utilities.GetObjectiveLine();
+                try
+                {
+                    IMyHudObjectiveLine objective = MyAPIGateway.Utilities.GetObjectiveLine();
 
-                if (objective.Visible)
-                    objective.Hide();
+                    if (objective.Visible)
+                        objective.Hide();
+                }
+                catch (Exception ex)
+                {
+                    MainChatCommandLogic.Instance.ClientLogger.WriteException(ex, "Exception caught during shutdown of mod.");
+                    // catch and ignore issues during shutdown.
+                }
             }
         }
 
@@ -131,11 +137,11 @@
                 if (heading.X < 0)
                     yawDirection = "Left";
 
-                objective.Objectives[_objectiveLine] = string.Format("Range:{0:N}m, Pitch {1}:{2:N}°, Yaw {3}:{4:N}°", distance, pitchDirection, Math.Abs(heading.Y), yawDirection, Math.Abs(heading.X));
+                objective.Objectives[_objectiveLine] = $"Range:{distance:N}m, Pitch {pitchDirection}:{Math.Abs(heading.Y):N}°, Yaw {yawDirection}:{Math.Abs(heading.X):N}°";
             }
         }
 
-        protected override void Dispose()
+        public override void Dispose()
         {
             Unload();
         }
