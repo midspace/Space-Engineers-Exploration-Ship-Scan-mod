@@ -84,17 +84,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ChatCommandService.cs" />
-    <Compile Include="CommandScanClear.cs" />
-    <Compile Include="CommandScanIgnore.cs" />
-    <Compile Include="CommandScanTrack.cs" />
+    <Compile Include="Commands\CommandScanClear.cs" />
+    <Compile Include="Commands\CommandScanIgnore.cs" />
+    <Compile Include="Commands\CommandScanTrack.cs" />
     <Compile Include="ScanSettings.cs" />
     <Compile Include="ShipGrid.cs" />
-    <Compile Include="CommandScan.cs" />
-    <Compile Include="ChatCommandSecurity.cs" />
+    <Compile Include="Commands\CommandScan.cs" />
     <Compile Include="Extensions.cs" />
-    <Compile Include="ChatCommand.cs" />
+    <Compile Include="Commands\ChatCommand.cs" />
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="ChatCommandLogicShipScan.cs" />
+    <Compile Include="ShipScanConsts.cs" />
     <Compile Include="Support.cs" />
     <Compile Include="TrackDetail.cs" />
   </ItemGroup>
@@ -104,6 +104,7 @@
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>rmdir /Q /S "$(ProjectDir)obj\"

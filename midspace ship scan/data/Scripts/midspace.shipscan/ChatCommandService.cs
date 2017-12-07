@@ -1,10 +1,9 @@
 ﻿namespace midspace.shipscan
 {
+    using Sandbox.ModAPI;
     using System;
     using System.Collections.Generic;
     using System.Linq;
-
-    using Sandbox.ModAPI;
 
     /// <summary>
     /// The Chat command service does most of the heavy work in organising and processing the ChatCommands.

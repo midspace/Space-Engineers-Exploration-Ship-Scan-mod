@@ -1,11 +1,10 @@
 ﻿namespace midspace.shipscan
 {
+    using Sandbox.ModAPI;
     using System;
     using System.Text.RegularExpressions;
-    using Sandbox.ModAPI;
     using VRage.Game;
     using VRage.Game.ModAPI;
-    using VRageMath;
     using IMyControllableEntity = VRage.Game.ModAPI.Interfaces.IMyControllableEntity;
 
     public class CommandScanTrack : ChatCommand

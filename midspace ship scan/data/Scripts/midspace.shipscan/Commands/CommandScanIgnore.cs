@@ -1,18 +1,12 @@
 ﻿namespace midspace.shipscan
 {
+    using Sandbox.ModAPI;
     using System;
     using System.Collections.Generic;
     using System.Linq;
 
-    using Sandbox.ModAPI;
-
     public class CommandScanIgnore : ChatCommand
     {
-        #region fields
-
-
-        #endregion
-
         public CommandScanIgnore()
             : base(ChatCommandSecurity.User, "ignore", new[] { "/ignore" })
         {
@@ -30,7 +24,7 @@
             if (config.IgnoreEnormous) ignoreList.Add(MassCategory.Enormous.ToString());
             if (config.IgnoreRidiculous) ignoreList.Add(MassCategory.Ridiculous.ToString());
 
-            var description = 
+            var description =
 string.Format(@"/ignore <type> <state>
 Function: Ignores the specified mass type by allowing you switch it on or off.
   <type> must be one of ""Junk, Tiny, Small, Large, Huge, Enormous, Ridiculous"".

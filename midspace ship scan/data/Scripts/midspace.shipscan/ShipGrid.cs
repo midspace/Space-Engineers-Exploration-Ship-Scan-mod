@@ -5,9 +5,6 @@
     using VRage.Game.ModAPI;
     using VRageMath;
 
-    public enum MassCategory { Unknown = 0, Junk = 1, Tiny = 2, Small, Large, Huge, Enormous, Ridiculous };
-    public enum SpeedCategory { Stationary = 0, Drifting = 3, Moving = 20, Flying };
-
     public class ShipGrid
     {
         public List<IMyCubeGrid> GridGroups { get; set; }
@@ -63,11 +60,11 @@
         {
             get
             {
-                var mass = GetMass();
+                //var mass = GetMass();
                 var cubeCount = GetBlockCount();
                 var cubedsize = GetCubedSize();
 
-                if (cubedsize < 5 && cubeCount <=5) return MassCategory.Junk;
+                if (cubedsize < 5 && cubeCount <= 5) return MassCategory.Junk;
                 if (cubedsize < 5) return MassCategory.Tiny;
                 if (cubedsize < 10) return MassCategory.Small;
                 if (cubedsize < 50) return MassCategory.Large;
@@ -92,7 +89,7 @@
             get
             {
                 var grid = GetLargestGrid();
-                var speed = grid.Physics != null ? grid.Physics.LinearVelocity.Length() : 0f;  // Can't use .Speed, as it doesn't preset the correct value under 01.063.008.
+                var speed = grid.Physics?.LinearVelocity.Length() ?? 0f;  // Can't use .Speed, as it doesn't preset the correct value under 01.063.008.
                 if (speed == 0) return SpeedCategory.Stationary;
                 if (speed < 3) return SpeedCategory.Drifting;
                 if (speed < 20) return SpeedCategory.Moving;

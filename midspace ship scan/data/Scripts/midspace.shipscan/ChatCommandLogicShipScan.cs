@@ -92,9 +92,6 @@ namespace midspace.shipscan
             _isInitilized = true; // Set this first to block any other calls from UpdateBeforeSimulation().
             MyAPIGateway.Utilities.MessageEntered += Utilities_MessageEntered;
 
-            // This will populate the _oreNames, _ingotNames, ready for the ChatCommands.
-            BuildResourceLookups();
-
             // New command classes must be added in here.
 
             ChatCommandService.Register(new CommandScan());
@@ -146,14 +143,6 @@ namespace midspace.shipscan
             {
                 sendToOthers = false;
             }
-        }
-
-        #endregion
-
-        #region helpers
-
-        private static void BuildResourceLookups()
-        {
         }
 
         #endregion

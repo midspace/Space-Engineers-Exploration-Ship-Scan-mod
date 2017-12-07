@@ -1,18 +1,9 @@
 ﻿namespace midspace.shipscan
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-
     using Sandbox.ModAPI;
 
     public class CommandScanClear : ChatCommand
     {
-        #region fields
-
-
-        #endregion
-
         public CommandScanClear()
             : base(ChatCommandSecurity.User, "scanclear", new[] { "/scanclear" })
         {

@@ -1,12 +1,11 @@
 namespace midspace.shipscan
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-
     using Sandbox.Common.ObjectBuilders;
     using Sandbox.Definitions;
     using Sandbox.ModAPI;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using VRage.Game;
     using VRage.Game.ModAPI;
     using VRage.ModAPI;
@@ -36,106 +35,8 @@ namespace midspace.shipscan
             if (cubeGrid == null)
                 return new List<IMyCubeGrid>();
 
-            var results = new List<IMyCubeGrid> { cubeGrid };
-            GetAttachedGrids(cubeGrid, ref results);
-            return results;
-        }
-
-        private static void GetAttachedGrids(IMyCubeGrid cubeGrid, ref List<IMyCubeGrid> results)
-        {
-            if (cubeGrid == null)
-                return;
-
-            var blocks = new List<IMySlimBlock>();
-            cubeGrid.GetBlocks(blocks, b => b != null && b.FatBlock != null && !b.FatBlock.BlockDefinition.TypeId.IsNull);
-
-            foreach (var block in blocks)
-            {
-                //MyAPIGateway.Utilities.ShowMessage("Block", string.Format("{0}", block.FatBlock.BlockDefinition.TypeId));
-
-                if (block.FatBlock.BlockDefinition.TypeId == typeof(MyObjectBuilder_MotorAdvancedStator) ||
-                    block.FatBlock.BlockDefinition.TypeId == typeof(MyObjectBuilder_MotorStator) ||
-                    block.FatBlock.BlockDefinition.TypeId == typeof(MyObjectBuilder_MotorSuspension) ||
-                    block.FatBlock.BlockDefinition.TypeId == typeof(MyObjectBuilder_MotorBase))
-                {
-                    // The MotorStator which inherits from MotorBase.
-                    IMyMotorBase motorBase = block.FatBlock as IMyMotorBase;
-
-                    if (motorBase == null)
-                    {
-                        //motorBase = Support.FindRotorBase(block.FatBlock.EntityId) as IMyMotorBase;
-                        //if (motorBase == null)
-                            continue;
-                    }
-
-                    IMyCubeGrid entityParent = motorBase.TopGrid;
-
-                    //MyAPIGateway.Utilities.ShowMessage("fail check3", string.Format("{0}.", entityParent == null));
-
-                    if (entityParent == null)
-                        continue;
-                    if (!results.Any(e => e.EntityId == entityParent.EntityId))
-                    {
-                        results.Add(entityParent);
-                        GetAttachedGrids(entityParent, ref results);
-                    }
-                }
-                else if (block.FatBlock.BlockDefinition.TypeId == typeof(MyObjectBuilder_MotorAdvancedRotor) ||
-                    block.FatBlock.BlockDefinition.TypeId == typeof(MyObjectBuilder_MotorRotor) ||
-                    block.FatBlock.BlockDefinition.TypeId == typeof(MyObjectBuilder_RealWheel) ||
-                    block.FatBlock.BlockDefinition.TypeId == typeof(MyObjectBuilder_Wheel))
-                {
-                    // The Rotor Part.
-                    IMyMotorRotor motorRotor = block.FatBlock as IMyMotorRotor;
-                    IMyCubeGrid entityParent;
-                    if (motorRotor == null || motorRotor.Base == null)
-                    {
-                        // Wheels appear to not properly populate the Stator property.
-                        IMyCubeBlock altBlock = Support.FindRotorBase(motorRotor.EntityId);
-                        if (altBlock == null)
-                            continue;
-
-                        entityParent = altBlock.CubeGrid;
-                    }
-                    else
-                        entityParent = motorRotor.Base.CubeGrid;
-                    if (!results.Any(e => e.EntityId == entityParent.EntityId))
-                    {
-                        results.Add(entityParent);
-                        GetAttachedGrids(entityParent, ref results);
-                    }
-                }
-                else if (block.FatBlock.BlockDefinition.TypeId == typeof (MyObjectBuilder_PistonTop))
-                {
-                    // The Piston Top.
-                    IMyPistonTop pistonTop = block.FatBlock as IMyPistonTop;
-                    if (pistonTop == null || pistonTop.Piston == null)
-                        continue;
-
-                    IMyCubeGrid entityParent = pistonTop.Piston.CubeGrid;
-                    if (!results.Any(e => e.EntityId == entityParent.EntityId))
-                    {
-                        results.Add(entityParent);
-                        GetAttachedGrids(entityParent, ref results);
-                    }
-                }
-                else if (block.FatBlock.BlockDefinition.TypeId == typeof (MyObjectBuilder_ExtendedPistonBase) ||
-                         block.FatBlock.BlockDefinition.TypeId == typeof (MyObjectBuilder_PistonBase))
-                {
-                    IMyPistonBase pistonBase = block.FatBlock as IMyPistonBase;
-                    if (pistonBase == null || pistonBase.Top == null)
-                        continue;
-
-                    IMyCubeGrid entityParent = pistonBase.TopGrid;
-                    if (entityParent == null)
-                        continue;
-                    if (!results.Any(e => e.EntityId == entityParent.EntityId))
-                    {
-                        results.Add(entityParent);
-                        GetAttachedGrids(entityParent, ref results);
-                    }
-                }
-            }
+            // Should include connections via: Landing Gear, Connectors, Rotors, Pistons, Suspension.
+            return MyAPIGateway.GridGroups.GetGroup(cubeGrid, GridLinkTypeEnum.Physical);
         }
 
         public static Vector3D Center(this IEnumerable<IMyCubeGrid> grids)

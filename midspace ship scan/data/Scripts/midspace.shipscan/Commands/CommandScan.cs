@@ -1,15 +1,14 @@
 ﻿namespace midspace.shipscan
 {
+    using Sandbox.Common.ObjectBuilders;
+    using Sandbox.Definitions;
+    using Sandbox.ModAPI;
     using System;
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
     using System.Text;
     using System.Text.RegularExpressions;
-
-    using Sandbox.Common.ObjectBuilders;
-    using Sandbox.Definitions;
-    using Sandbox.ModAPI;
     using VRage.Game;
     using VRage.Game.ModAPI;
     using VRage.ModAPI;
@@ -198,7 +197,7 @@
 
                     ShipCache.Clear();
 
-                }, delegate()
+                }, delegate ()
             {
                 switch (displayType)
                 {

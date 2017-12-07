@@ -25,4 +25,24 @@
         /// </summary>
         Experimental = 0x4
     };
+
+    public enum MassCategory
+    {
+        Unknown = 0,
+        Junk = 1,
+        Tiny = 2,
+        Small,
+        Large,
+        Huge,
+        Enormous,
+        Ridiculous
+    };
+
+    public enum SpeedCategory
+    {
+        Stationary = 0,
+        Drifting = 3,
+        Moving = 20,
+        Flying
+    };
 }

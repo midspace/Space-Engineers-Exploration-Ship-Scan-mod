@@ -1,10 +1,9 @@
 namespace midspace.shipscan
 {
-    using System;
-    using System.Collections.Generic;
-
     using Sandbox.Common.ObjectBuilders;
     using Sandbox.ModAPI;
+    using System;
+    using System.Collections.Generic;
     using VRage.Game.ModAPI;
     using VRage.ModAPI;
     using VRageMath;

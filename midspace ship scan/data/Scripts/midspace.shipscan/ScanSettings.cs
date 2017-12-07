@@ -1,9 +1,9 @@
 ﻿namespace midspace.shipscan
 {
+    using Sandbox.ModAPI;
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using Sandbox.ModAPI;
     using VRage;
 
     public class ScanSettings
