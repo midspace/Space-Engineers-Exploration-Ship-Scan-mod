@@ -54,63 +54,84 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Sandbox.Common">
-      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Reference Assemblies\SpaceEngineers\Sandbox.Common.dll</HintPath>
-    </Reference>
-    <Reference Include="Sandbox.Game">
-      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Reference Assemblies\SpaceEngineers\Sandbox.Game.dll</HintPath>
-    </Reference>
-    <Reference Include="SpaceEngineers.ObjectBuilders">
-      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Reference Assemblies\SpaceEngineers\SpaceEngineers.ObjectBuilders.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="VRage, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Reference Assemblies\SpaceEngineers\VRage.dll</HintPath>
+    <Reference Include="Sandbox.Common">
+      <HintPath>C:\Program Files\Reference Assemblies\SpaceEngineers\Sandbox.Common.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Sandbox.Game">
+      <HintPath>C:\Program Files\Reference Assemblies\SpaceEngineers\Sandbox.Game.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="SpaceEngineers.Game">
+      <HintPath>C:\Program Files\Reference Assemblies\SpaceEngineers\SpaceEngineers.Game.dll</HintPath>
+    </Reference>
+    <Reference Include="SpaceEngineers.ObjectBuilders">
+      <HintPath>C:\Program Files\Reference Assemblies\SpaceEngineers\SpaceEngineers.ObjectBuilders.dll</HintPath>
+    </Reference>
+    <Reference Include="VRage">
+      <HintPath>C:\Program Files\Reference Assemblies\SpaceEngineers\VRage.dll</HintPath>
     </Reference>
     <Reference Include="VRage.Game">
-      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Reference Assemblies\SpaceEngineers\VRage.Game.dll</HintPath>
+      <HintPath>C:\Program Files\Reference Assemblies\SpaceEngineers\VRage.Game.dll</HintPath>
     </Reference>
     <Reference Include="VRage.Library">
-      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Reference Assemblies\SpaceEngineers\VRage.Library.dll</HintPath>
+      <HintPath>C:\Program Files\Reference Assemblies\SpaceEngineers\VRage.Library.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="VRage.Math">
-      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Reference Assemblies\SpaceEngineers\VRage.Math.dll</HintPath>
+      <HintPath>C:\Program Files\Reference Assemblies\SpaceEngineers\VRage.Math.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="VRage.Render">
+      <HintPath>C:\Program Files\Reference Assemblies\SpaceEngineers\VRage.Render.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ClientConfig.cs" />
-    <Compile Include="ModFramework\Messages\MessageChatCommand.cs" />
-    <Compile Include="ModFramework\Messages\MessageClientDialogMessage.cs" />
-    <Compile Include="ModFramework\Messages\MessageClientNotification.cs" />
-    <Compile Include="ModFramework\Messages\MessageClientTextMessage.cs" />
-    <Compile Include="Messages\MessageTest.cs" />
-    <Compile Include="ModFramework\ChatCommandService.cs" />
-    <Compile Include="Commands\CommandScanClear.cs" />
-    <Compile Include="Commands\CommandScanIgnore.cs" />
-    <Compile Include="Commands\CommandScanTrack.cs" />
-    <Compile Include="ModFramework\ConnectionHelper.cs" />
-    <Compile Include="ModFramework\Messages\MessageConnectionRequest.cs" />
-    <Compile Include="ModFramework\Messages\MessageConnectionResponse.cs" />
-    <Compile Include="ModFramework\ModMessageBase.cs" />
-    <Compile Include="Messages\ModMessageBaseList.cs" />
-    <Compile Include="ScanSettings.cs" />
-    <Compile Include="ShipGrid.cs" />
-    <Compile Include="Commands\CommandScan.cs" />
-    <Compile Include="ModFramework\Extensions.cs" />
-    <Compile Include="ModFramework\ChatCommand.cs" />
     <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="MainChatCommandLogic.cs" />
-    <Compile Include="ModConfigurationConsts.cs" />
-    <Compile Include="ShipScanConsts.cs" />
-    <Compile Include="ProgrammableBlockLogic.cs" />
-    <Compile Include="Support.cs" />
-    <Compile Include="ModFramework\TextLogger.cs" />
-    <Compile Include="TrackDetail.cs" />
+    <Compile Include="SeModCore\Messages\MessageChatCommand.cs" />
+    <Compile Include="SeModCore\Messages\MessageClientDialogMessage.cs" />
+    <Compile Include="SeModCore\Messages\MessageClientNotification.cs" />
+    <Compile Include="SeModCore\Messages\MessageClientTextMessage.cs" />
+    <Compile Include="SeModCore\Messages\MessageConnectionRequest.cs" />
+    <Compile Include="SeModCore\Messages\MessageConnectionResponse.cs" />
+    <Compile Include="SeModCore\IChatCommandLogic.cs" />
+    <Compile Include="SeModCore\ChatCommand.cs" />
+    <Compile Include="SeModCore\ChatCommandService.cs" />
+    <Compile Include="SeModCore\ConnectionHelper.cs" />
+    <Compile Include="SeModCore\MainChatCommandLogic.cs" />
+    <Compile Include="SeModCore\ModCoreConsts.cs" />
+    <Compile Include="SeModCore\ModCoreExtensions.cs" />
+    <Compile Include="SeModCore\ModMessageBase.cs" />
+    <Compile Include="SeModCore\TextLogger.cs" />
+    <Compile Include="ShipScan\Messages\MessageClearScan.cs" />
+    <Compile Include="ShipScan\Messages\MessageSetIgnore.cs" />
+    <Compile Include="ShipScan\Messages\MessageSetTrack.cs" />
+    <Compile Include="ShipScan\Messages\MessageInitiateScan.cs" />
+    <Compile Include="ShipScan\Messages\ModMessageBaseList.cs" />
+    <Compile Include="ShipScan\Commands\CommandHelp.cs" />
+    <Compile Include="ShipScan\Commands\CommandScanClear.cs" />
+    <Compile Include="ShipScan\Commands\CommandScanIgnore.cs" />
+    <Compile Include="ShipScan\Commands\CommandScanTrack.cs" />
+    <Compile Include="ShipScan\Commands\CommandScan.cs" />
+    <Compile Include="ShipScan\Entities\ScanServerEntity.cs" />
+    <Compile Include="ShipScan\Entities\ScanSettingsEntity.cs" />
+    <Compile Include="ShipScan\Entities\TrackDetailEntity.cs" />
+    <Compile Include="ShipScan\Entities\TrackGpsEntity.cs" />
+    <Compile Include="ShipScan\ClientConfig.cs" />
+    <Compile Include="ShipScan\Extensions.cs" />
+    <Compile Include="ShipScan\ModConfigurationConsts.cs" />
+    <Compile Include="ShipScan\MyShipScanModLogic.cs" />
+    <Compile Include="ShipScan\ProgrammableBlockLogicChatCmds.cs" />
+    <Compile Include="ShipScan\ScanDataManager.cs" />
+    <Compile Include="ShipScan\SerializableMatrix.cs" />
+    <Compile Include="ShipScan\ShipGridExtension.cs" />
+    <Compile Include="ShipScan\ShipScanConsts.cs" />
+    <Compile Include="ShipScan\Support.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\modinfo.sbmi">
