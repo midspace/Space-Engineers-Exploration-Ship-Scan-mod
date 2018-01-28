@@ -35,7 +35,7 @@ namespace midspace.shipscan
             _objectBuilder = objectBuilder;
             if (MyAPIGateway.Session.OnlineMode.Equals(MyOnlineModeEnum.OFFLINE) || MyAPIGateway.Multiplayer.IsServer)
             {
-                this.NeedsUpdate |= MyEntityUpdateEnum.EACH_100TH_FRAME;
+                this.NeedsUpdate |= MyEntityUpdateEnum.BEFORE_NEXT_FRAME;
 
                 if (!_isInitilized)
                 {
@@ -65,9 +65,10 @@ namespace midspace.shipscan
                 var blocks = new List<IMySlimBlock>();
                 obj.CubeGrid.GetBlocks(blocks, f => f.FatBlock is IMyCockpit);
 
-                long ownerId = _programmableBlockEntity.OwnerId;
-
                 // check to see if the owner is currenting playing and is a pilot of the ship.
+                // Also check for faction shared ownership.
+                // This matches the owner checks in MessageInitiateScan, even though it does not read the same.
+                // Blame this on the lack of ability to get the player or IdentityId from the Character.
                 foreach (IMySlimBlock block in blocks)
                 {
                     IMyCharacter pilotCharacter = ((IMyCockpit)block.FatBlock).Pilot;
@@ -75,13 +76,17 @@ namespace midspace.shipscan
                     if (pilotCharacter != null)
                     {
                         var players = new List<IMyPlayer>();
-                        MyAPIGateway.Players.GetPlayers(players, p => p.IdentityId == ownerId && p.Character != null && p.Character.EntityId == pilotCharacter.EntityId);
+                        MyAPIGateway.Players.GetPlayers(players, p => p.Character != null && p.Character.EntityId == pilotCharacter.EntityId);
                         IMyPlayer player = players.FirstOrDefault();
 
                         if (player != null)
                         {
-                            ConnectionHelper.SendMessageToPlayer(player.SteamUserId, new MessageChatCommand { IdentityId = player.IdentityId, TextCommand = data });
-                            return;
+                            var relation = _programmableBlockEntity.GetUserRelationToOwner(player.IdentityId);
+                            if (relation == MyRelationsBetweenPlayerAndBlock.Owner || relation == MyRelationsBetweenPlayerAndBlock.FactionShare)
+                            {
+                                ConnectionHelper.SendMessageToPlayer(player.SteamUserId, new MessageChatCommand {IdentityId = player.IdentityId, TextCommand = data});
+                                return;
+                            }
                         }
                     }
                 }
