@@ -68,7 +68,7 @@
             {
                 _isTracking = false;
                 MyAPIGateway.Utilities.ShowNotification("Cancelling tracking", 2000, MyFontEnum.White);
-                Unload();
+                ClearHudObjective();
                 return;
             }
 
@@ -84,7 +84,7 @@
             objective.Show();
         }
 
-        private void Unload()
+        private void ClearHudObjective()
         {
             if (MyAPIGateway.Session != null)
             {
@@ -122,7 +122,7 @@
                 {
                     _isTracking = false;
                     MyAPIGateway.Utilities.ShowNotification("Cockpit changed - tracking cancelled", 2500, MyFontEnum.Red);
-                    Unload();
+                    ClearHudObjective();
                     MessageClearScan.SendMessage(ScanType.ChatConsole);
                     return;
                 }
@@ -146,11 +146,5 @@
                 objective.Objectives[_objectiveLine] = $"Range:{distance:N}m, Pitch {pitchDirection}:{Math.Abs(heading.Y):N}°, Yaw {yawDirection}:{Math.Abs(heading.X):N}°";
             }
         }
-
-        public override void Dispose()
-        {
-            Unload();
-        }
-
     }
 }
