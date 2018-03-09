@@ -107,7 +107,7 @@
             //MyAPIGateway.Multiplayer.SendMessageToOthers(ModConfigurationConsts.ConnectionId, MyAPIGateway.Utilities.SerializeToBinary(message)); // <- does not work as expected ... so it doesn't work at all?
 
             List<IMyPlayer> players = new List<IMyPlayer>();
-            MyAPIGateway.Players.GetPlayers(players, p => p != null);
+            MyAPIGateway.Players.GetPlayers(players, p => p != null && !p.IsBot);
             foreach (IMyPlayer player in players)
                 SendMessageToPlayer(player.SteamUserId, message);
         }

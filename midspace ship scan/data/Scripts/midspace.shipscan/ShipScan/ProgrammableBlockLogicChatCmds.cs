@@ -65,6 +65,8 @@ namespace midspace.shipscan
                 var blocks = new List<IMySlimBlock>();
                 obj.CubeGrid.GetBlocks(blocks, f => f.FatBlock is IMyCockpit);
 
+                // TODO: check multi grid.
+
                 // check to see if the owner is currenting playing and is a pilot of the ship.
                 // Also check for faction shared ownership.
                 // This matches the owner checks in MessageInitiateScan, even though it does not read the same.
