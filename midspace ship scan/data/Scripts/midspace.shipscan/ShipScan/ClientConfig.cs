@@ -14,5 +14,11 @@
 
         // This is a test property for Serialization changes, and can be removed.
         public int Test1 { get; set; }
+
+
+        internal static ClientConfig FetchClientResponse()
+        {
+            return new ClientConfig {};
+        }
     }
 }

@@ -166,14 +166,13 @@ namespace midspace.shipscan
 
         internal void CancelClientConnection()
         {
-            if (ClientConfig != null)
+            ClientLogger.WriteStart("Canceling further Connection Request.");
+            if (DelayedConnectionRequestTimer != null)
             {
-                if (DelayedConnectionRequestTimer != null)
-                {
-                    DelayedConnectionRequestTimer.Stop();
-                    DelayedConnectionRequestTimer.Close();
-                }
+                DelayedConnectionRequestTimer.Stop();
+                DelayedConnectionRequestTimer.Close();
             }
+            _delayedConnectionRequest = false;
         }
 
         private void InitServer()

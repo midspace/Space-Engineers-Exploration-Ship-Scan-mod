@@ -1,6 +1,6 @@
 using System.Reflection;
 
-//[assembly: AssemblyTitle("MidSpace Space Engineeers Ship Scan script")]
+[assembly: AssemblyTitle("MidSpace Space Engineeers Ship Scan script")]
 [assembly: AssemblyDescription("Space Engineers Script")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Mid-Space Productions")]

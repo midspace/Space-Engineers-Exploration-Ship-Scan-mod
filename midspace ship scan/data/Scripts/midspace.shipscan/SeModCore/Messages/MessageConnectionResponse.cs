@@ -21,7 +21,8 @@
         [ProtoMember(205)]
         public uint UserSecurity { get; set; }
 
-        // Client config needs to be handled by the mod, not the ModCore.
+        [ProtoMember(206)]
+        public ClientConfig ClientConfig { get; set; }
 
         public static void SendMessage(ulong steamdId, int clientModCommunicationVersion, int serverModCommunicationVersion, uint userSecurity)
         {
@@ -30,9 +31,11 @@
             {
                 IsOldCommunicationVersion = clientModCommunicationVersion < serverModCommunicationVersion,
                 IsNewCommunicationVersion = clientModCommunicationVersion > serverModCommunicationVersion,
-                UserSecurity = userSecurity
+                UserSecurity = userSecurity,
+                // TODO: Not sure if there is a better way to seperate this, unless we can use an Interface, Action or handler for the Mod to send it's response.
+                // Client config needs to be handled by the mod, not the ModCore.
+                ClientConfig = ClientConfig.FetchClientResponse()
             });
-            // TODO: Need an Action or handler for the Mod to send it's response.
         }
 
         public override void ProcessClient()
@@ -76,6 +79,8 @@
                 }
                 MainChatCommandLogic.Instance.ClientLogger.WriteInfo($"Mod Warning: The {ModConfigurationConsts.ModTitle} mod is currently unavailable as it is out of date on the server. Please contact your server Administrator to make sure they have the latest version of the mod.");
             }
+
+            MainChatCommandLogic.Instance.ClientConfig = ClientConfig;
             MainChatCommandLogic.Instance.IsConnected = isConnected;
             MainChatCommandLogic.Instance.ResponseReceived = true;
         }
