@@ -1,7 +1,7 @@
-﻿namespace midspace.shipscan
+﻿namespace MidSpace.ShipScan.Entities
 {
-    using ProtoBuf;
     using System.Xml.Serialization;
+    using ProtoBuf;
     using VRage;
     using VRageMath;
 

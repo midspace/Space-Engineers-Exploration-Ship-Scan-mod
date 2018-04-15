@@ -1,6 +1,7 @@
-﻿namespace midspace.shipscan
+﻿namespace MidSpace.ShipScan.SeModCore
 {
     using System;
+    using Messages;
     using ProtoBuf;
 
     [ProtoContract]
@@ -10,6 +11,9 @@
     [ProtoInclude(53, typeof(MessageClientTextMessage))]
     [ProtoInclude(54, typeof(MessageConnectionRequest))]
     [ProtoInclude(55, typeof(MessageConnectionResponse))]
+    [ProtoInclude(56, typeof(MessageClientSound))]
+    [ProtoInclude(57, typeof(MessageClientConfig))]
+
     // This contains the ModCore Messages. Modder programmers should add their own Messages to the other Partial class.
     public abstract partial class ModMessageBase
     {

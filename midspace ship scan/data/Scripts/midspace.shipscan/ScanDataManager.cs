@@ -1,6 +1,8 @@
-﻿namespace midspace.shipscan
+﻿namespace MidSpace.ShipScan
 {
+    using Entities;
     using Sandbox.ModAPI;
+    using SeModCore;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
@@ -93,7 +95,6 @@
 
             return playerScanData;
         }
-
 
     }
 }

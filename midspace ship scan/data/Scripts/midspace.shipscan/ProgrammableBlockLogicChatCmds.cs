@@ -1,7 +1,9 @@
-namespace midspace.shipscan
+namespace MidSpace.ShipScan
 {
     using Sandbox.Common.ObjectBuilders;
     using Sandbox.ModAPI;
+    using SeModCore;
+    using SeModCore.Messages;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -86,7 +88,7 @@ namespace midspace.shipscan
                             var relation = _programmableBlockEntity.GetUserRelationToOwner(player.IdentityId);
                             if (relation == MyRelationsBetweenPlayerAndBlock.Owner || relation == MyRelationsBetweenPlayerAndBlock.FactionShare)
                             {
-                                ConnectionHelper.SendMessageToPlayer(player.SteamUserId, new MessageChatCommand {IdentityId = player.IdentityId, TextCommand = data});
+                                ConnectionHelper.SendMessageToPlayer(player.SteamUserId, new MessageChatCommand { IdentityId = player.IdentityId, TextCommand = data });
                                 return;
                             }
                         }

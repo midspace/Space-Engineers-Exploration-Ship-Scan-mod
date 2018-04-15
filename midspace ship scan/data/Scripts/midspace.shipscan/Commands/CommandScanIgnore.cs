@@ -1,19 +1,23 @@
-﻿namespace midspace.shipscan
+﻿namespace MidSpace.ShipScan.Commands
 {
-    using Sandbox.ModAPI;
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Entities;
+    using Helpers;
+    using Sandbox.ModAPI;
+    using SeModCore;
 
     public class CommandScanIgnore : ChatCommand
     {
         public CommandScanIgnore()
-            : base(ChatCommandSecurity.User, ChatCommandAccessibility.Client, "ignore", new[] { "/ignore" })
+            : base(ChatCommandSecurity.User, ChatCommandAccessibility.Server, "ignore", new[] { "/ignore" })
         {
         }
 
         public override void Help(ulong steamId, bool brief)
         {
+            // needs to be called server side to fetch settings. We aren't storing any of this client side.
             ScanSettingsEntity scanSettings = ScanDataManager.GetPlayerScanData(steamId);
 
             var ignoreList = new List<string>();
@@ -41,7 +45,7 @@
 
             ";
 
-            MyAPIGateway.Utilities.ShowMissionScreen("/Ignore Help", null, " ", description, null, "OK");
+            MyAPIGateway.Utilities.SendMissionScreen(steamId, "/Ignore Help", null, " ", description, null, "OK");
         }
 
         public override bool Invoke(ulong steamId, long playerId, string messageText)
@@ -53,7 +57,7 @@
                 return true;
             }
 
-            var categories = (IEnumerable<MassCategory>)Enum.GetValues(typeof(MassCategory));
+            MassCategory[] categories = (MassCategory[])Enum.GetValues(typeof(MassCategory));
             string massclass = null;
 
             foreach (var category in categories)
@@ -83,7 +87,25 @@
             bool setIgnore;
             if (commands[2].TryWordParseBool(out setIgnore))
             {
-                MessageSetIgnore.SendMessage(massclass, setIgnore);
+                ScanSettingsEntity scanSettings = ScanDataManager.GetPlayerScanData(steamId);
+
+                if (massclass == MassCategory.Junk.ToString())
+                    scanSettings.IgnoreJunk = setIgnore;
+                if (massclass == MassCategory.Tiny.ToString())
+                    scanSettings.IgnoreTiny = setIgnore;
+                if (massclass == MassCategory.Small.ToString())
+                    scanSettings.IgnoreSmall = setIgnore;
+                if (massclass == MassCategory.Large.ToString())
+                    scanSettings.IgnoreLarge = setIgnore;
+                if (massclass == MassCategory.Huge.ToString())
+                    scanSettings.IgnoreHuge = setIgnore;
+                if (massclass == MassCategory.Enormous.ToString())
+                    scanSettings.IgnoreEnormous = setIgnore;
+                if (massclass == MassCategory.Ridiculous.ToString())
+                    scanSettings.IgnoreRidiculous = setIgnore;
+
+                MyAPIGateway.Utilities.SendMessage(steamId, $"Ignore {massclass}", setIgnore ? "On" : "Off");
+
                 return true;
             }
 

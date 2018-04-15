@@ -1,9 +1,11 @@
-﻿namespace midspace.shipscan
+﻿namespace MidSpace.ShipScan.Commands
 {
-    using Sandbox.ModAPI;
     using System;
     using System.Globalization;
     using System.Text.RegularExpressions;
+    using Messages;
+    using Sandbox.ModAPI;
+    using SeModCore;
     using VRage.Game.ModAPI;
 
     public class CommandScan : ChatCommand

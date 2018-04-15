@@ -1,4 +1,4 @@
-﻿namespace midspace.shipscan
+﻿namespace MidSpace.ShipScan.Entities
 {
     using System.Collections.Generic;
     using System.Xml.Serialization;

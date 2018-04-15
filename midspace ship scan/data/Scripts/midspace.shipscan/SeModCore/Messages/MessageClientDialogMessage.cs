@@ -1,4 +1,4 @@
-﻿namespace midspace.shipscan
+﻿namespace MidSpace.ShipScan.SeModCore.Messages
 {
     using ProtoBuf;
     using Sandbox.ModAPI;

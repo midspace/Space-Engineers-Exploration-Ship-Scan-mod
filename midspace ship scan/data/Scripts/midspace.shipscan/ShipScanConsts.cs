@@ -1,9 +1,13 @@
-﻿namespace midspace.shipscan
+﻿namespace MidSpace.ShipScan
 {
+    using Sandbox.ModAPI;
+    using SeModCore;
+    using VRage.Game;
+
     /// <summary>
     /// These options control the Mod's static configuration and are not designed to be dynamically configurable.
     /// </summary>
-    internal class ModConfigurationConsts
+    internal class ShipScanConsts
     {
         /// <summary>
         /// This is used to indicate the base communication version.
@@ -15,8 +19,7 @@
         /// communications classes. A Player will connect to the server, and will automatically download version 2.
         /// We would now have a Client running newer communication classes trying to talk to the Server with older classes.
         /// </remarks>
-        internal const int ModCommunicationVersion = 20171231; // This will be based on the date of update.
-        // TODO: this needs to be implmented
+        internal const int ModCommunicationVersion = 20180415; // This will be based on the date of update.
 
         /// <summary>
         /// The is the Id which this mod registers itself for sending and receiving messages through SE. 
@@ -28,8 +31,10 @@
         /// </remarks>
         internal const ushort ConnectionId = 13675;
 
+        internal static readonly LogEventType ClientLoggingLevel = MyAPIGateway.Session.OnlineMode == MyOnlineModeEnum.OFFLINE ? LogEventType.All : LogEventType.Information;
         internal const string ClientLogFileName = "ShipScanClient.Log";
 
+        internal static readonly LogEventType ServerLoggingLevel = MyAPIGateway.Session.OnlineMode == MyOnlineModeEnum.OFFLINE ? LogEventType.All : LogEventType.Information;
         internal const string ServerLogFileName = "ShipScanServer.Log";
 
         /// <summary>
@@ -50,4 +55,30 @@
         internal static ulong[] ExperimentalCreatorList = { 76561197961224864UL, 76561198048142826UL };
     }
 
+    public enum MassCategory
+    {
+        Unknown = 0,
+        Junk = 1,
+        Tiny = 2,
+        Small,
+        Large,
+        Huge,
+        Enormous,
+        Ridiculous
+    };
+
+    public enum SpeedCategory
+    {
+        Stationary = 0,
+        Drifting = 3,
+        Moving = 20,
+        Flying
+    };
+
+    public enum ScanType
+    {
+        ChatConsole = 0,
+        MissionScreen = 1,
+        GpsCoordinates = 2
+    };
 }

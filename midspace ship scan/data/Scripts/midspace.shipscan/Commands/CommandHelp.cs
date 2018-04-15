@@ -1,5 +1,7 @@
-﻿namespace midspace.shipscan
+﻿namespace MidSpace.ShipScan.Commands
 {
+    using SeModCore;
+
     public class CommandHelp : ChatCommand
     {
         public CommandHelp()

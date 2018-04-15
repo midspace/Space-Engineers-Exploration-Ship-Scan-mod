@@ -1,11 +1,10 @@
-namespace midspace.shipscan
+namespace MidSpace.ShipScan.Helpers
 {
-    using Sandbox.Common.ObjectBuilders;
-    using Sandbox.ModAPI;
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using VRage.Game;
+    using Sandbox.Common.ObjectBuilders;
+    using Sandbox.ModAPI;
     using VRage.Game.ModAPI;
     using VRage.ModAPI;
     using VRageMath;

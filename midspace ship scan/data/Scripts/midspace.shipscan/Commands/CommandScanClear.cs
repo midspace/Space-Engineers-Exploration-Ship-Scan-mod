@@ -1,6 +1,8 @@
-﻿namespace midspace.shipscan
+﻿namespace MidSpace.ShipScan.Commands
 {
+    using Messages;
     using Sandbox.ModAPI;
+    using SeModCore;
 
     public class CommandScanClear : ChatCommand
     {

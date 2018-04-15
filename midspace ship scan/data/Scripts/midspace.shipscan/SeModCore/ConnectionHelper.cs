@@ -1,8 +1,8 @@
-﻿namespace midspace.shipscan
+﻿namespace MidSpace.ShipScan.SeModCore
 {
-    using Sandbox.ModAPI;
     using System;
     using System.Collections.Generic;
+    using Sandbox.ModAPI;
     using VRage.Game.ModAPI;
 
     /// <summary>
@@ -37,7 +37,7 @@
             try
             {
                 byte[] byteData = MyAPIGateway.Utilities.SerializeToBinary(message);
-                MyAPIGateway.Multiplayer.SendMessageToServer(ModConfigurationConsts.ConnectionId, byteData);
+                MyAPIGateway.Multiplayer.SendMessageToServer(MainChatCommandLogic.Instance.ConnectionId, byteData);
             }
             catch (Exception ex)
             {
@@ -88,7 +88,7 @@
             message.Side = MessageSide.ClientSide;
             try
             {
-                MyAPIGateway.Multiplayer.SendMessageTo(ModConfigurationConsts.ConnectionId, MyAPIGateway.Utilities.SerializeToBinary(message), steamId);
+                MyAPIGateway.Multiplayer.SendMessageTo(MainChatCommandLogic.Instance.ConnectionId, MyAPIGateway.Utilities.SerializeToBinary(message), steamId);
             }
             catch (Exception ex)
             {

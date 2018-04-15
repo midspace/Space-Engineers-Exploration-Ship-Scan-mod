@@ -4,7 +4,7 @@
 //using System.Text;
 //using System.Threading.Tasks;
 
-//namespace midspace.shipscan
+//namespace MidSpace.ShipScan
 //{
 //    // TODO: implement an interface for MainChatCommandLogic and this to implement it.
 //    // I haven't gotten this working as expected. It's probably a waste of time, as the abstract class is doing what it should do.

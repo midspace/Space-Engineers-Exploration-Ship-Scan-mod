@@ -1,9 +1,10 @@
-﻿namespace midspace.shipscan
+﻿namespace MidSpace.ShipScan.SeModCore
 {
-    using Sandbox.ModAPI;
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Messages;
+    using Sandbox.ModAPI;
     using VRage.Game;
 
     /// <summary>
@@ -101,41 +102,6 @@
             return false;
         }
 
-        ///// <summary>
-        ///// This will use _commandShortcuts dictionary to only run the specific ChatCommands that has the specified command text registered.
-        ///// </summary>
-        ///// <param name="messageText"></param>
-        ///// <returns>Returns true if a valid command was found and successfuly invoked.</returns>
-        //public static bool ProcessMessage(string messageText)
-        //{
-            //if (!_isInitialized || string.IsNullOrEmpty(messageText))
-            //    return false;
-
-            //var commands = messageText.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-            //if (commands.Length == 0)
-            //    return false;
-
-            //var comandList = CommandShortcuts.Where(k => k.Key.Equals(commands[0], StringComparison.InvariantCultureIgnoreCase));
-            //foreach (var command in comandList.Where(command => (command.Value.Security & _userSecurity) != ChatCommandSecurity.None))
-            //{
-            //    try
-            //    {
-            //        if (command.Value.Invoke(messageText))
-            //            return true;
-            //    }
-            //    catch (Exception ex)
-            //    {
-            //        // Exception handling to prevent any crash in the ChatCommand's reaching the user.
-
-            //        var message = ex.Message.Replace("\r", " ").Replace("\n", " ");
-            //        message = message.Substring(0, Math.Min(message.Length, 50));
-            //        MyAPIGateway.Utilities.ShowMessage("Error", "Occured attempting to run {0}.\r\n{1}", command, message);
-            //    }
-            //}
-
-        //    return false;
-        //}
-
         /// <summary>
         /// This will use _commandShortcuts dictionary to only run the specific ChatCommands that has the specified command text registered.
         /// </summary>
@@ -201,7 +167,10 @@
                     try
                     {
                         if (!MainChatCommandLogic.Instance.IsConnected)
-                            return false;
+                        {
+                            MyAPIGateway.Utilities.ShowMessage("Please wait", $"Cannot execute command yet: {messageText}");
+                            return true;
+                        }
 
                         if (command.Value.Invoke(MyAPIGateway.Session.Player.SteamUserId, MyAPIGateway.Session.Player.IdentityId, messageText))
                             return true;
@@ -224,6 +193,8 @@
                         var message = ex.Message.Replace("\r", " ").Replace("\n", " ");
                         message = message.Substring(0, Math.Min(message.Length, 50));
                         MyAPIGateway.Utilities.ShowMessage("Error", "Occured attempting to run {0}.\r\n{1}", command, message);
+
+                        MainChatCommandLogic.Instance.ClientLogger.WriteException(ex, $"Occured attempting to run {command}");
                     }
                 }
                 else if (command.Value.HasFlag(ChatCommandAccessibility.Server))
@@ -307,7 +278,7 @@
                     {
                         // Exception handling to prevent any crash in the ChatCommand's reaching the user.
                         // Additional information for developers
-                        if (ModConfigurationConsts.ExperimentalCreatorList.Contains(steamId))
+                        if (MainChatCommandLogic.Instance.ExperimentalCreatorList.Contains(steamId))
                         {
                             MyAPIGateway.Utilities.SendMissionScreen(steamId, $"Error in {command.Value.Name}", "Input: ", messageText, ex.ToString());
                             VRage.Utils.MyLog.Default.WriteLine($"##Mod## Admin Helper mod Exception caught. Message: {ex}");
@@ -373,7 +344,7 @@
         public static bool HasRight(ulong steamId, ChatCommand command)
         {
             if (command.HasFlag(ChatCommandAccessibility.Experimental))
-                return ModConfigurationConsts.ExperimentalCreatorList.Contains(steamId) && command.Security <= UserSecurity;
+                return MainChatCommandLogic.Instance.ExperimentalCreatorList.Contains(steamId) && command.Security <= UserSecurity;
 
             return command.Security <= UserSecurity;
         }

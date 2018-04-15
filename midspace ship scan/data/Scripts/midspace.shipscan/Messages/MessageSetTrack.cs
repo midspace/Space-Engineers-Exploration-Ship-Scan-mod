@@ -1,13 +1,16 @@
-﻿namespace midspace.shipscan
+﻿namespace MidSpace.ShipScan.Messages
 {
+    using Commands;
+    using Entities;
     using ProtoBuf;
     using Sandbox.ModAPI;
+    using SeModCore;
 
     /// <summary>
     /// This will fetch the data required to track a scan detection, for the player to display
     /// </summary>
     [ProtoContract]
-    public class MessageSetTrack : ModMessageBase
+    public class MessageSetTrack : SeModCore.ModMessageBase
     {
         #region properties
 

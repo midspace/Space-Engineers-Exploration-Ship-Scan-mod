@@ -1,5 +1,8 @@
-﻿namespace midspace.shipscan
+﻿namespace MidSpace.ShipScan
 {
+    using Commands;
+    using Entities;
+    using SeModCore;
     using System.Collections.Generic;
     using VRage.Game.Components;
 
@@ -25,17 +28,30 @@
     {
         public ScanServerEntity ServerData;
 
+        public override void InitModSettings(out int modCommunicationVersion, out ushort connectionId, out LogEventType clientLoggingLevel, out string clientLogFileName, out LogEventType serverLoggingLevel, out string serverLogFileName, out string modName, out string modTitle, out ulong[] experimentalCreatorList)
+        {
+            modCommunicationVersion = ShipScanConsts.ModCommunicationVersion;
+            connectionId = ShipScanConsts.ConnectionId;
+            clientLoggingLevel = ShipScanConsts.ClientLoggingLevel;
+            clientLogFileName = ShipScanConsts.ClientLogFileName;
+            serverLoggingLevel = ShipScanConsts.ServerLoggingLevel;
+            serverLogFileName = ShipScanConsts.ServerLogFileName;
+            modName = ShipScanConsts.ModName;
+            modTitle = ShipScanConsts.ModTitle;
+            experimentalCreatorList = ShipScanConsts.ExperimentalCreatorList;
+        }
+
         // TODO: create an interface for MainChatCommandLogic and this to implement it.
         public override List<ChatCommand> GetAllChatCommands()
         {
-            List<ChatCommand> commands = new List<ChatCommand>();
-            // New command classes must be added in here.
-
-            commands.Add(new CommandScan());
-            commands.Add(new CommandScanIgnore());
-            commands.Add(new CommandScanTrack());
-            commands.Add(new CommandScanClear());
-            return commands;
+            return new List<ChatCommand>
+            {
+                // New command classes must be added in here.
+                new CommandScan(),
+                new CommandScanIgnore(),
+                new CommandScanTrack(),
+                new CommandScanClear()
+            };
         }
 
         public override void ServerLoad()
@@ -49,6 +65,11 @@
             {
                 ScanDataManager.SaveData(ServerData);
             }
+        }
+
+        public override ClientConfigBase GetConfig()
+        {
+            return MidSpace.ShipScan.ClientConfig.FetchClientResponse();
         }
     }
 }

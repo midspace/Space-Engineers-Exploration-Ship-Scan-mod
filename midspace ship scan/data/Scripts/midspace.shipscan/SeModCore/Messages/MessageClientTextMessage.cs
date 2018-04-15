@@ -1,4 +1,4 @@
-﻿namespace midspace.shipscan
+﻿namespace MidSpace.ShipScan.SeModCore.Messages
 {
     using ProtoBuf;
     using Sandbox.ModAPI;
@@ -22,7 +22,7 @@
             // never processed on server.
         }
 
-        public static void SendMessage(ulong steamId, string prefix, string content, params object[] args )
+        public static void SendMessage(ulong steamId, string prefix, string content, params object[] args)
         {
             string message;
             if (args == null || args.Length == 0)

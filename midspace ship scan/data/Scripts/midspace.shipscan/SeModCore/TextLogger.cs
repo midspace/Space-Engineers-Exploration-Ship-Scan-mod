@@ -1,9 +1,8 @@
-﻿namespace midspace.shipscan
+﻿namespace MidSpace.ShipScan.SeModCore
 {
-    using System;
-    using System.Diagnostics;
-    using System.IO;
     using Sandbox.ModAPI;
+    using System;
+    using System.IO;
     using VRage;
 
     /// <summary>
@@ -14,6 +13,7 @@
         #region fields
 
         private string _logFileName;
+        private LogEventType _loggingLevel;
         private TextWriter _logWriter;
         private bool _isInitialized;
         private int _delayedWrite;
@@ -43,6 +43,7 @@
         {
             _isInitialized = true;
             _logFileName = $"TextLog_{(MyAPIGateway.Session != null ? Path.GetFileNameWithoutExtension(MyAPIGateway.Session.CurrentPath) : "0")}_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.log";
+            _loggingLevel = LogEventType.All;
         }
 
         /// <summary>
@@ -51,20 +52,22 @@
         /// This allows a TextLogger to be created and the Write(...) methods invoked without the TextLogger initialized so you don't have to wrap the TextLogger variable with if statements.
         /// </summary>
         /// <param name="filename"></param>
+        /// <param name="loggingLevel"></param>
         /// <param name="addTimestamp"></param>
         /// <param name="delayedWrite"></param>
-        public void Init(string filename, bool addTimestamp = false, int delayedWrite = 0)
+        public void Init(string filename, LogEventType loggingLevel, bool addTimestamp = false, int delayedWrite = 0)
         {
             _isInitialized = true;
             if (addTimestamp)
                 _logFileName = $"TextLog_{Path.GetFileNameWithoutExtension(filename)}_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}{Path.GetExtension(filename)}";
             else
-                _logFileName = filename;
+                _logFileName = Path.GetFileName(filename);
 
+            _loggingLevel = loggingLevel;
             _delayedWrite = delayedWrite;
         }
 
-        // Because Keen hate Finalizers?
+        // This isn't whitelisted, because Keen hate Finalizers?
         //~TextLogger()
         //{
         //    Terminate();
@@ -74,53 +77,63 @@
 
         public void WriteStart(string text, params object[] args)
         {
-            Write(TraceEventType.Start, false, text, args);
+            if (LogEventType.Start <= _loggingLevel)
+                Write(LogEventType.Start, false, text, args);
         }
 
         public void WriteStop(string text, params object[] args)
         {
-            Write(TraceEventType.Stop, false, text, args);
+            if (LogEventType.Stop <= _loggingLevel)
+                Write(LogEventType.Stop, false, text, args);
         }
 
         public void WriteVerbose(string text, params object[] args)
         {
-            Write(TraceEventType.Verbose, false, text, args);
+            if (LogEventType.Verbose <= _loggingLevel)
+                Write(LogEventType.Verbose, false, text, args);
         }
 
         public void WriteInfo(string text, params object[] args)
         {
-            Write(TraceEventType.Information, false, text, args);
+            if (LogEventType.Information <= _loggingLevel)
+                Write(LogEventType.Information, false, text, args);
         }
 
         public void WriteWarning(string text, params object[] args)
         {
-            Write(TraceEventType.Warning, false, text, args);
+            if (LogEventType.Warning <= _loggingLevel)
+                Write(LogEventType.Warning, false, text, args);
         }
 
         public void WriteError(string text, params object[] args)
         {
-            Write(TraceEventType.Error, false, text, args);
+            if (LogEventType.Error <= _loggingLevel)
+                Write(LogEventType.Error, false, text, args);
         }
 
-        public void WriteRaw(TraceEventType eventType, string text, params object[] args)
+        public void WriteRaw(LogEventType eventType, string text, params object[] args)
         {
-            Write(eventType, true, text, args);
+            if (eventType <= _loggingLevel)
+                Write(eventType, true, text, args);
         }
 
         public void WriteException(Exception ex, string additionalInformation = null)
         {
-            string msg = ex + "\r\n";
-
-            if (!string.IsNullOrEmpty(additionalInformation))
+            if (LogEventType.Critical <= _loggingLevel)
             {
-                msg += $"Additional information on {ex.Message}:\r\n";
-                msg += additionalInformation + "\r\n";
-            }
+                string msg = ex + "\r\n";
 
-            Write(TraceEventType.Error, false, msg);
+                if (!string.IsNullOrEmpty(additionalInformation))
+                {
+                    msg += $"Additional information on {ex.Message}:\r\n";
+                    msg += additionalInformation + "\r\n";
+                }
+
+                Write(LogEventType.Error, false, msg);
+            }
         }
 
-        private void Write(TraceEventType eventType, bool writeRaw, string text, params object[] args)
+        private void Write(LogEventType eventType, bool writeRaw, string text, params object[] args)
         {
             if (!_isInitialized)
                 return;
@@ -135,7 +148,7 @@
                 catch (Exception ex)
                 {
                     Terminate();
-                    WriteGameLog("## TextLogger Exception caught in mod. Message: {0}", ex.Message);
+                    WriteGameLog($"## TextLogger Exception caught in mod. Message: {ex}");
                     return;
                 }
             }
@@ -151,7 +164,7 @@
             else
                 _logWriter.WriteLine("{0:yyyy-MM-dd HH:mm:ss.fff} - {1}", DateTime.Now, message);
             _writeCounter++;
-            if (_delayedWrite == 0 || _writeCounter > _delayedWrite || eventType <= TraceEventType.Error)
+            if (_delayedWrite == 0 || _writeCounter > _delayedWrite || eventType <= LogEventType.Error)
             {
                 _logWriter.Flush();
                 _writeCounter = 0;
@@ -200,4 +213,53 @@
                 VRage.Utils.MyLog.Default.WriteLine(message);
         }
     }
+
+    /// <summary>
+    /// Identifies the type of event that has caused the log item.
+    /// </summary>
+    public enum LogEventType
+    {
+        None = 0,
+
+        /// <summary>
+        /// Fatal error or application crash.
+        /// </summary>
+        Critical = 1,
+
+        /// <summary>
+        /// Recoverable error.
+        /// </summary>
+        Error = 2,
+
+        /// <summary>
+        /// Noncritical problem.
+        /// </summary>
+        Warning = 4,
+
+        /// <summary>
+        /// Informational message.
+        /// </summary>
+        Information = 8,
+
+        /// <summary>
+        /// Starting of a logical operation.
+        /// </summary>
+        Start = 128,
+
+        /// <summary>
+        /// Stopping of a logical operation.
+        /// </summary>
+        Stop = 256,
+
+        /// <summary>
+        /// Debugging trace.
+        /// </summary>
+        Verbose = 512,
+
+        /// <summary>
+        /// All details.
+        /// </summary>
+        All = 4096
+    }
+
 }

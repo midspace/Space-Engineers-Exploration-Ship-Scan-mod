@@ -1,13 +1,15 @@
-﻿namespace midspace.shipscan
+﻿namespace MidSpace.ShipScan.Messages
 {
+    using Entities;
     using ProtoBuf;
     using Sandbox.ModAPI;
+    using SeModCore;
 
     /// <summary>
     /// this will clear gps scan markers.
     /// </summary>
     [ProtoContract]
-    public class MessageClearScan : ModMessageBase
+    public class MessageClearScan : SeModCore.ModMessageBase
     {
         /// <summary>
         /// The type of scan type to carry out.

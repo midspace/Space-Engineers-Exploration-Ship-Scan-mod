@@ -1,9 +1,10 @@
-namespace midspace.shipscan
+namespace MidSpace.ShipScan.SeModCore
 {
-    using Sandbox.ModAPI;
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Messages;
+    using Sandbox.ModAPI;
     using VRage.Game;
     using VRage.Game.ModAPI;
 
@@ -74,7 +75,7 @@ namespace midspace.shipscan
         /// <returns></returns>
         public static bool IsExperimentalCreator(this IMyPlayer player)
         {
-            return ModConfigurationConsts.ExperimentalCreatorList.Contains(player.SteamUserId);
+            return MainChatCommandLogic.Instance.ExperimentalCreatorList.Contains(player.SteamUserId);
         }
 
         #endregion
@@ -123,20 +124,13 @@ namespace midspace.shipscan
             return listplayers.FirstOrDefault();
         }
 
-        //public static IMyPlayer GetPlayer(this IMyPlayerCollection collection, ulong steamId)
+        //public static bool TryGetIdentity(this IMyPlayerCollection collection, long identityId, out IMyIdentity identity)
         //{
-        //    var players = new List<IMyPlayer>();
-        //    collection.GetPlayers(players, p => p.SteamUserId == steamId);
-        //    return players.FirstOrDefault();
+        //    var listIdentites = new List<IMyIdentity>();
+        //    MyAPIGateway.Players.GetAllIdentites(listIdentites, p => p.IdentityId == identityId);
+        //    identity = listIdentites.FirstOrDefault();
+        //    return identity != null;
         //}
-
-        //        public static bool TryGetIdentity(this IMyPlayerCollection collection, long identityId, out IMyIdentity identity)
-        //        {
-        //            var listIdentites = new List<IMyIdentity>();
-        //            MyAPIGateway.Players.GetAllIdentites(listIdentites, p => p.IdentityId == identityId);
-        //            identity = listIdentites.FirstOrDefault();
-        //            return identity != null;
-        //        }
 
         #endregion
     }

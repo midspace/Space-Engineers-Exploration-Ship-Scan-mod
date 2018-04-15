@@ -1,4 +1,4 @@
-﻿namespace midspace.shipscan
+﻿namespace MidSpace.ShipScan.SeModCore
 {
     /// <summary>
     /// Defines the base for all ChatCommands.
@@ -15,7 +15,7 @@
         /// <summary>
         /// Required access level of a player to see and use this ChatCommand.
         /// </summary>
-        public ChatCommandAccessibility Flag { get; private set; }
+        public ChatCommandAccessibility Flag { get; }
 
         /// <summary>
         /// The name of the ChatCommand as it will appear in the Help list.

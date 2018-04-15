@@ -1,8 +1,11 @@
-﻿namespace midspace.shipscan
+﻿namespace MidSpace.ShipScan.SeModCore.Messages
 {
     using ProtoBuf;
     using Sandbox.ModAPI;
 
+    /// <summary>
+    /// This allows other parts of the mod, such as server side Cube logic to queue up commands for processing, as if they had been typed by a player.
+    /// </summary>
     [ProtoContract]
     public class MessageChatCommand : ModMessageBase
     {

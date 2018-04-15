@@ -1,13 +1,16 @@
-﻿namespace midspace.shipscan
+﻿namespace MidSpace.ShipScan.Messages
 {
-    using ProtoBuf;
-    using Sandbox.Common.ObjectBuilders;
-    using Sandbox.Definitions;
-    using Sandbox.ModAPI;
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
+    using Entities;
+    using Helpers;
+    using ProtoBuf;
+    using Sandbox.Common.ObjectBuilders;
+    using Sandbox.Definitions;
+    using Sandbox.ModAPI;
+    using SeModCore;
     using VRage.Game;
     using VRage.Game.ModAPI;
     using VRage.ModAPI;
@@ -17,7 +20,7 @@
     /// This will process and run the scan, then return the results to the player.
     /// </summary>
     [ProtoContract]
-    public class MessageInitiateScan : ModMessageBase
+    public class MessageInitiateScan : SeModCore.ModMessageBase
     {
         #region properties
 

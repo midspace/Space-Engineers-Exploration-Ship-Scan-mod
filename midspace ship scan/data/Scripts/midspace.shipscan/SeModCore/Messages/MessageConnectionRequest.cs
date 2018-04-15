@@ -1,4 +1,4 @@
-﻿namespace midspace.shipscan
+﻿namespace MidSpace.ShipScan.SeModCore.Messages
 {
     using ProtoBuf;
     using Sandbox.ModAPI;
@@ -34,18 +34,18 @@
             IMyPlayer player = MyAPIGateway.Players.GetPlayer(SenderSteamId);
             if (player == null)
             {
-                MainChatCommandLogic.Instance.ServerLogger.WriteVerbose($"Player '{SenderDisplayName}' {SenderSteamId} connected with invalid SteamId or before server has player information ready.");
+                MainChatCommandLogic.Instance.ServerLogger.WriteWarning($"Player '{SenderDisplayName}' {SenderSteamId} connected with invalid SteamId or before server has player information ready.");
                 // If the Server isn't ready yet, the Client will send another Request automatically.
                 // If the SteamId is invalid, we'll keep ignoring it anyhow.
                 return;
             }
 
-            MainChatCommandLogic.Instance.ServerLogger.WriteVerbose($"Player '{SenderDisplayName}' {SenderSteamId} connected. Version {ModCommunicationVersion}");
+            MainChatCommandLogic.Instance.ServerLogger.WriteInfo($"Player '{SenderDisplayName}' {SenderSteamId} connected. Version {ModCommunicationVersion}");
 
             uint userSecurity = player.UserSecurityLevel();
 
             // Is Server version older than what Client is running, or Server version is newer than Client.
-            MessageConnectionResponse.SendMessage(SenderSteamId, ModCommunicationVersion, ModConfigurationConsts.ModCommunicationVersion, userSecurity);
+            MessageConnectionResponse.SendMessage(SenderSteamId, ModCommunicationVersion, MainChatCommandLogic.Instance.ModCommunicationVersion, userSecurity);
         }
 
         public static void SendMessage(int modCommunicationVersion, long privateCommunicationKey)

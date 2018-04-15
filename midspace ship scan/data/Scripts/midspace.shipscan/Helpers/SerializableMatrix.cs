@@ -1,4 +1,4 @@
-﻿namespace midspace.shipscan
+﻿namespace MidSpace.ShipScan.Helpers
 {
     using ProtoBuf;
     using VRageMath;

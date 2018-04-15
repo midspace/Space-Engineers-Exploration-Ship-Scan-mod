@@ -1,4 +1,4 @@
-// SE Mod Core V4.0
+// SE Mod Core V4.1
 // Author: MidSpace
 // Copyright © MidSpace 2014-2018
 //
@@ -12,8 +12,9 @@
 // 
 // This code is licensed under the GNU General Public License, version 3
 
-namespace midspace.shipscan
+namespace MidSpace.ShipScan.SeModCore
 {
+    using Messages;
     using Sandbox.ModAPI;
     using System;
     using System.Collections.Generic;
@@ -50,9 +51,42 @@ namespace midspace.shipscan
         /// This will temporarily store Client side details while the client is connected.
         /// It will receive periodic updates from the server.
         /// </summary>
-        public ClientConfig ClientConfig = null;
+        public ClientConfigBase ClientConfig = null;
 
         internal long PrivateCommunicationKey;
+
+        /// <summary>
+        /// This is used to indicate the base communication version.
+        /// </summary>
+        internal int ModCommunicationVersion;
+
+        /// <summary>
+        /// The is the Id which this mod registers itself for sending and receiving messages through SE. 
+        /// </summary>
+        internal ushort ConnectionId;
+
+        internal LogEventType ClientLoggingLevel;
+        internal string ClientLogFileName;
+
+        internal LogEventType ServerLoggingLevel;
+        internal string ServerLogFileName;
+
+        /// <summary>
+        ///  Used for filenames. Shouldn't have unfriendly characters.
+        /// </summary>
+        internal string ModName;
+
+        /// <summary>
+        /// Used for display boxes and friendly information.
+        /// </summary>
+        internal string ModTitle;
+
+        /// <summary>
+        /// Hardcoded list of SteamIDs, for testing stuff that hasn't been released to the public yet.
+        /// It shouldn't be used to hide functionality away in the published mod, simply prevent
+        /// incomplete or broken stuff from been used until it is ready.
+        /// </summary>
+        internal ulong[] ExperimentalCreatorList;
 
         #endregion
 
@@ -62,29 +96,48 @@ namespace midspace.shipscan
         //internal static IChatCommandLogic Instance;
 
         public abstract List<ChatCommand> GetAllChatCommands();
+        public abstract ClientConfigBase GetConfig();
+        public abstract void InitModSettings(out int modCommunicationVersion, out ushort connectionId, out LogEventType clientLoggingLevel, out string clientLogFileName, out LogEventType serverLoggingLevel, out string serverLogFileName, out string modName, out string modTitle, out ulong[] experimentalCreatorList);
+
+        public virtual void UpdateBeforeFrame() { }
+        public virtual void UpdateBeforeFrame100() { }
+        public virtual void UpdateBeforeFrame1000() { }
+        public virtual void UpdateAfterFrame() { }
 
         public virtual void ClientLoad() { }
         public virtual void ClientSave() { }
         public virtual void ServerLoad() { }
         public virtual void ServerSave() { }
 
+
         internal bool ResponseReceived { get; set; }
+
+        /// <summary>
+        /// Indicates that this Client sucessful received config from the server.
+        /// </summary>
         internal bool IsConnected { get; set; }
 
-        // This is a dummy logger until Init() is called.
+        /// <summary>
+        /// Indicates that this instance is a registered client, and all Game related API's are active.
+        /// </summary>
         public bool IsClientRegistered => _isClientRegistered;
-        // This is a dummy logger until Init() is called.
+
+        /// <summary>
+        /// Indicates that this instance is a register server.
+        /// </summary>
         public bool IsServerRegistered => _isServerRegistered;
 
+        // This is a dummy logger until Init() is called.
         public TextLogger ServerLogger { get; } = new TextLogger();
 
+        // This is a dummy logger until Init() is called.
         public TextLogger ClientLogger { get; } = new TextLogger();
 
         #endregion
 
         #region constructor
 
-        public MainChatCommandLogic()
+        protected MainChatCommandLogic()
         {
             //TextLogger.WriteGameLog($"####### {ModConfigurationConsts.ModName} CTOR");
             Instance = this;
@@ -93,11 +146,19 @@ namespace midspace.shipscan
 
         #endregion
 
-
         #region attaching events and wiring up
 
-        public override void Init(MyObjectBuilder_SessionComponent sessionComponent)
+        public sealed override void Init(MyObjectBuilder_SessionComponent sessionComponent)
         {
+            InitModSettings(out ModCommunicationVersion, out ConnectionId, out ClientLoggingLevel, out ClientLogFileName, out ServerLoggingLevel, out ServerLogFileName, out ModName, out ModTitle, out ExperimentalCreatorList);
+            Guard.IsNotZero(ModCommunicationVersion, "InitModSettings must supply ModCommunicationVersion");
+            Guard.IsNotZero(ConnectionId, "InitModSettings must supply ConnectionId");
+            Guard.IsNotEmpty(ClientLogFileName, "InitModSettings must supply ClientLogFileName");
+            Guard.IsNotEmpty(ServerLogFileName, "InitModSettings must supply ServerLogFileName");
+            Guard.IsNotEmpty(ModName, "InitModSettings must supply ModName");
+            Guard.IsNotEmpty(ModTitle, "InitModSettings must supply ModTitle");
+
+
             //TextLogger.WriteGameLog($"####### {ModConfigurationConsts.ModName} INIT");
 
             //if (MyAPIGateway.Utilities == null)
@@ -137,62 +198,71 @@ namespace midspace.shipscan
 
             if (_isClientRegistered)
                 ClientLoad();
+
+            ServerLogger.WriteInfo($"{ModName} is ready.");
+            // Client is only `ready` after it has received the ClientConfigResponse. We log that in MessageClientConfig.
         }
 
         private void InitClient()
         {
             _isClientRegistered = true;
-            ClientLogger.Init(ModConfigurationConsts.ClientLogFileName, false, 0); // comment this out if logging is not required for the Client.
-            ClientLogger.WriteStart($"{ModConfigurationConsts.ModName} Client Log Started");
-            ClientLogger.WriteInfo($"{ModConfigurationConsts.ModName} Client Version {ModConfigurationConsts.ModCommunicationVersion}");
+            ClientLogger.Init(ClientLogFileName, ClientLoggingLevel, false, 0); // comment this out if logging is not required for the Client.
+            ClientLogger.WriteInfo($"{ModName} Client Log Started");
+            ClientLogger.WriteInfo($"{ModName} Client Version {ModCommunicationVersion}");
+            if (ClientLogger.IsActive)
+                TextLogger.WriteGameLog($"##Mod## {ModName} Client Logging File: {ClientLogger.LogFile}");
 
             MyAPIGateway.Utilities.MessageEntered += ChatMessageEntered;
 
             if (MyAPIGateway.Multiplayer.MultiplayerActive && !_isServerRegistered) // if not the server, also need to register the messagehandler.
             {
                 ClientLogger.WriteStart("RegisterMessageHandler");
-                MyAPIGateway.Multiplayer.RegisterMessageHandler(ModConfigurationConsts.ConnectionId, _messageHandler);
+                MyAPIGateway.Multiplayer.RegisterMessageHandler(ConnectionId, _messageHandler);
             }
 
-            DelayedConnectionRequestTimer = new Timer(10000);
+            // Offline connections can be re-attempted quickly. Online games needs to wait longer.
+            DelayedConnectionRequestTimer = new Timer(MyAPIGateway.Session.OnlineMode == MyOnlineModeEnum.OFFLINE ? 500 : 10000);
             DelayedConnectionRequestTimer.Elapsed += DelayedConnectionRequestTimer_Elapsed;
             DelayedConnectionRequestTimer.Start();
 
             // let the server know we are ready for connections
-            MessageConnectionRequest.SendMessage(ModConfigurationConsts.ModCommunicationVersion, PrivateCommunicationKey);
+            MessageConnectionRequest.SendMessage(ModCommunicationVersion, PrivateCommunicationKey);
 
             ClientLogger.Flush();
         }
 
         internal void CancelClientConnection()
         {
-            ClientLogger.WriteStart("Canceling further Connection Request.");
-            if (DelayedConnectionRequestTimer != null)
+            if (ClientConfig != null)
             {
-                DelayedConnectionRequestTimer.Stop();
-                DelayedConnectionRequestTimer.Close();
+                ClientLogger.WriteStart("Canceling further Connection Request.");
+                if (DelayedConnectionRequestTimer != null)
+                {
+                    DelayedConnectionRequestTimer.Stop();
+                    DelayedConnectionRequestTimer.Close();
+                }
+                _delayedConnectionRequest = false;
             }
-            _delayedConnectionRequest = false;
         }
 
         private void InitServer()
         {
             _isServerRegistered = true;
-            ServerLogger.Init(ModConfigurationConsts.ServerLogFileName, false, 0); // comment this out if logging is not required for the Server.
-            ServerLogger.WriteStart($"{ModConfigurationConsts.ModName} Server Log Started");
-            ServerLogger.WriteInfo($"{ModConfigurationConsts.ModName} Server Version {ModConfigurationConsts.ModCommunicationVersion}");
+            ServerLogger.Init(ServerLogFileName, ServerLoggingLevel, false, 0); // comment this out if logging is not required for the Server.
+            ServerLogger.WriteInfo($"{ModName} Server Log Started");
+            ServerLogger.WriteInfo($"{ModName} Server Version {ModCommunicationVersion}");
             if (ServerLogger.IsActive)
-                TextLogger.WriteGameLog($"##Mod## {ModConfigurationConsts.ModName} Server Logging File: {ServerLogger.LogFile}");
+                TextLogger.WriteGameLog($"##Mod## {ModName} Server Logging File: {ServerLogger.LogFile}");
 
             ServerLogger.WriteStart("RegisterMessageHandler");
-            MyAPIGateway.Multiplayer.RegisterMessageHandler(ModConfigurationConsts.ConnectionId, _messageHandler);
+            MyAPIGateway.Multiplayer.RegisterMessageHandler(ConnectionId, _messageHandler);
 
             ServerLogger.Flush();
         }
 
         #endregion
 
-        public override void UpdateBeforeSimulation()
+        public sealed override void UpdateBeforeSimulation()
         {
             _frameCounter100++;
             _frameCounter1000++;
@@ -204,27 +274,35 @@ namespace midspace.shipscan
             {
                 ClientLogger.WriteInfo("Delayed Connection Request");
                 _delayedConnectionRequest = false;
-                MessageConnectionRequest.SendMessage(ModConfigurationConsts.ModCommunicationVersion, PrivateCommunicationKey);
+                MessageConnectionRequest.SendMessage(ModCommunicationVersion, PrivateCommunicationKey);
             }
 
+            UpdateBeforeFrame();
             ChatCommandService.UpdateBeforeSimulation();
 
             if (_frameCounter100 >= 100)
             {
                 _frameCounter100 = 0;
+                UpdateBeforeFrame100();
                 ChatCommandService.UpdateBeforeSimulation100();
             }
 
             if (_frameCounter1000 >= 1000)
             {
                 _frameCounter1000 = 0;
+                UpdateBeforeFrame1000();
                 ChatCommandService.UpdateBeforeSimulation1000();
             }
         }
 
+        public sealed override void UpdateAfterSimulation()
+        {
+            UpdateAfterFrame();
+        }
+
         #region detaching events
 
-        protected override void UnloadData()
+        protected sealed override void UnloadData()
         {
             //TextLogger.WriteGameLog($"####### {ModConfigurationConsts.ModName} UNLOAD");
 
@@ -245,27 +323,27 @@ namespace midspace.shipscan
                 if (!_isServerRegistered) // if not the server, also need to unregister the messagehandler.
                 {
                     ClientLogger.WriteStop("UnregisterMessageHandler");
-                    MyAPIGateway.Multiplayer.UnregisterMessageHandler(ModConfigurationConsts.ConnectionId, _messageHandler);
+                    MyAPIGateway.Multiplayer.UnregisterMessageHandler(ConnectionId, _messageHandler);
                 }
 
-                ClientLogger.WriteStop("Log Closed");
+                ClientLogger.WriteInfo("Log Closed");
                 ClientLogger.Terminate();
             }
 
             if (_isServerRegistered)
             {
                 ServerLogger.WriteStop("UnregisterMessageHandler");
-                MyAPIGateway.Multiplayer.UnregisterMessageHandler(ModConfigurationConsts.ConnectionId, _messageHandler);
+                MyAPIGateway.Multiplayer.UnregisterMessageHandler(ConnectionId, _messageHandler);
 
-                ServerLogger.WriteStop("Log Closed");
+                ServerLogger.WriteInfo("Log Closed");
                 ServerLogger.Terminate();
             }
-            
+
             if (_commandsRegistered)
                 ChatCommandService.DisposeCommands();
         }
 
-        public override void SaveData()
+        public sealed override void SaveData()
         {
             if (_isServerRegistered)
             {
@@ -311,5 +389,6 @@ namespace midspace.shipscan
                 DelayedConnectionRequestTimer.Close();
             }
         }
+
     }
 }

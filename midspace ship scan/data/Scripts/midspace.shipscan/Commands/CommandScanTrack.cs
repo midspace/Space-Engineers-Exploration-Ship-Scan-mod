@@ -1,8 +1,12 @@
-﻿namespace midspace.shipscan
+﻿namespace MidSpace.ShipScan.Commands
 {
-    using Sandbox.ModAPI;
     using System;
     using System.Text.RegularExpressions;
+    using Entities;
+    using Helpers;
+    using Messages;
+    using Sandbox.ModAPI;
+    using SeModCore;
     using VRage.Game;
     using VRage.Game.ModAPI;
     using VRage.Game.ModAPI.Interfaces;

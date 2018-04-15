@@ -1,4 +1,4 @@
-﻿namespace midspace.shipscan
+﻿namespace MidSpace.ShipScan.SeModCore
 {
     using System;
 
@@ -67,7 +67,7 @@
     }
 
     [Flags]
-    public enum ChatCommandAccessibility
+    public enum ChatCommandAccessibility : byte
     {
         /// <summary>
         /// No flag set for this command.
