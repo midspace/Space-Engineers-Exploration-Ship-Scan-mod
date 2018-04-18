@@ -1,12 +1,12 @@
 ﻿namespace MidSpace.ShipScan.Commands
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
     using Entities;
     using Helpers;
     using Sandbox.ModAPI;
     using SeModCore;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
 
     public class CommandScanIgnore : ChatCommand
     {

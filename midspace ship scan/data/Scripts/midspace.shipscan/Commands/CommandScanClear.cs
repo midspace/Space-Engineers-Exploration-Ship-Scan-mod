@@ -18,7 +18,7 @@
 
         public override bool Invoke(ulong steamId, long playerId, string messageText)
         {
-            MessageClearScan.SendMessage(ScanType.GpsCoordinates);
+            PullClearScan.SendMessage(ScanType.GpsCoordinates);
             return true;
         }
     }

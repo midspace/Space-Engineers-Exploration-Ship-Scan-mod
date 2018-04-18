@@ -1,6 +1,5 @@
 ﻿namespace MidSpace.ShipScan.Messages
 {
-    using Commands;
     using Entities;
     using ProtoBuf;
     using Sandbox.ModAPI;
@@ -10,7 +9,7 @@
     /// This will fetch the data required to track a scan detection, for the player to display
     /// </summary>
     [ProtoContract]
-    public class MessageSetTrack : SeModCore.ModMessageBase
+    public class PullSetTrack : PullMessageBase
     {
         #region properties
 
@@ -20,20 +19,11 @@
         [ProtoMember(201)]
         public string ShipName;
 
-        [ProtoMember(202)]
-        public TrackDetailEntity TrackEntity;
-
         #endregion
 
         public static void SendMessage(string shipName)
         {
-            ConnectionHelper.SendMessageToServer(new MessageSetTrack { ShipName = shipName });
-        }
-
-        public override void ProcessClient()
-        {
-            // set client side properties...
-           CommandScanTrack.SetTracking(TrackEntity);
+            ConnectionHelper.SendMessageToServer(new PullSetTrack { ShipName = shipName });
         }
 
         public override void ProcessServer()
@@ -57,7 +47,7 @@
             }
 
             // send an empty TrackEntity if no shipname is provided. This Action should clear any current tracking.
-            ConnectionHelper.SendMessageToPlayer(SenderSteamId, new MessageSetTrack { TrackEntity = detail });
+            ConnectionHelper.SendMessageToPlayer(SenderSteamId, new PushSetTrack { TrackEntity = detail });
         }
     }
 }

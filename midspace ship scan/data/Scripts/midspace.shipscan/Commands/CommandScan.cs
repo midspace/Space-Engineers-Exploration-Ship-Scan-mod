@@ -1,11 +1,11 @@
 ﻿namespace MidSpace.ShipScan.Commands
 {
-    using System;
-    using System.Globalization;
-    using System.Text.RegularExpressions;
     using Messages;
     using Sandbox.ModAPI;
     using SeModCore;
+    using System;
+    using System.Globalization;
+    using System.Text.RegularExpressions;
     using VRage.Game.ModAPI;
 
     public class CommandScan : ChatCommand
@@ -30,7 +30,7 @@
             {
                 minRange = decimal.Parse(match.Groups["MINRANGE"].Value, CultureInfo.InvariantCulture);
                 if (minRange <= 0) minRange = 0;
-                MessageInitiateScan.SendMessage(minRange, ScanType.MissionScreen, player.Controller.ControlledEntity.Entity.WorldMatrix, player.Controller.ControlledEntity.Entity.EntityId);
+                PullInitiateScan.SendMessage(minRange, ScanType.MissionScreen, player.Controller.ControlledEntity.Entity.WorldMatrix, player.Controller.ControlledEntity.Entity.EntityId);
                 return true;
             }
 
@@ -39,7 +39,7 @@
             {
                 minRange = decimal.Parse(match.Groups["MINRANGE"].Value, CultureInfo.InvariantCulture);
                 if (minRange <= 0) minRange = 0;
-                MessageInitiateScan.SendMessage(minRange, ScanType.ChatConsole, player.Controller.ControlledEntity.Entity.WorldMatrix, player.Controller.ControlledEntity.Entity.EntityId);
+                PullInitiateScan.SendMessage(minRange, ScanType.ChatConsole, player.Controller.ControlledEntity.Entity.WorldMatrix, player.Controller.ControlledEntity.Entity.EntityId);
                 return true;
             }
 
@@ -48,23 +48,23 @@
             {
                 minRange = decimal.Parse(match.Groups["MINRANGE"].Value, CultureInfo.InvariantCulture);
                 if (minRange <= 0) minRange = 0;
-                MessageInitiateScan.SendMessage(minRange, ScanType.GpsCoordinates, player.Controller.ControlledEntity.Entity.WorldMatrix, player.Controller.ControlledEntity.Entity.EntityId);
+                PullInitiateScan.SendMessage(minRange, ScanType.GpsCoordinates, player.Controller.ControlledEntity.Entity.WorldMatrix, player.Controller.ControlledEntity.Entity.EntityId);
                 return true;
             }
 
             if (messageText.Equals("/scan", StringComparison.InvariantCultureIgnoreCase))
             {
-                MessageInitiateScan.SendMessage(0, ScanType.MissionScreen, player.Controller.ControlledEntity.Entity.WorldMatrix, player.Controller.ControlledEntity.Entity.EntityId);
+                PullInitiateScan.SendMessage(0, ScanType.MissionScreen, player.Controller.ControlledEntity.Entity.WorldMatrix, player.Controller.ControlledEntity.Entity.EntityId);
                 return true;
             }
             if (messageText.Equals("/scan2", StringComparison.InvariantCultureIgnoreCase))
             {
-                MessageInitiateScan.SendMessage(0, ScanType.ChatConsole, player.Controller.ControlledEntity.Entity.WorldMatrix, player.Controller.ControlledEntity.Entity.EntityId);
+                PullInitiateScan.SendMessage(0, ScanType.ChatConsole, player.Controller.ControlledEntity.Entity.WorldMatrix, player.Controller.ControlledEntity.Entity.EntityId);
                 return true;
             }
             if (messageText.Equals("/scan3", StringComparison.InvariantCultureIgnoreCase))
             {
-                MessageInitiateScan.SendMessage(0, ScanType.GpsCoordinates, player.Controller.ControlledEntity.Entity.WorldMatrix, player.Controller.ControlledEntity.Entity.EntityId);
+                PullInitiateScan.SendMessage(0, ScanType.GpsCoordinates, player.Controller.ControlledEntity.Entity.WorldMatrix, player.Controller.ControlledEntity.Entity.EntityId);
                 return true;
             }
 

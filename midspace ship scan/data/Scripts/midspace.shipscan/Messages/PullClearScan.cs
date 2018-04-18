@@ -9,7 +9,7 @@
     /// this will clear gps scan markers.
     /// </summary>
     [ProtoContract]
-    public class MessageClearScan : SeModCore.ModMessageBase
+    public class PullClearScan : SeModCore.PullMessageBase
     {
         /// <summary>
         /// The type of scan type to carry out.
@@ -19,12 +19,7 @@
 
         public static void SendMessage(ScanType displayType)
         {
-            ConnectionHelper.SendMessageToServer(new MessageClearScan { DisplayType = displayType });
-        }
-
-        public override void ProcessClient()
-        {
-            // never processed on client
+            ConnectionHelper.SendMessageToServer(new PullClearScan { DisplayType = displayType });
         }
 
         public override void ProcessServer()

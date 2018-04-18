@@ -30,5 +30,13 @@
             if (value == null)
                 throw new Exception(message);
         }
+
+        public static void IsNotEqual(object value1, object value2, string message)
+        {
+            if (value1 == null && value2 == null)
+                throw new Exception(message);
+            if (value1?.Equals(value2) ?? false)
+                throw new Exception(message);
+        }
     }
 }

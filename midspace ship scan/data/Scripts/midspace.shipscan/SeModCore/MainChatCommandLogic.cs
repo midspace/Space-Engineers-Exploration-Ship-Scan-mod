@@ -1,4 +1,4 @@
-// SE Mod Core V4.1
+// SE Mod Core V4.2
 // Author: MidSpace
 // Copyright © MidSpace 2014-2018
 //
@@ -34,12 +34,13 @@ namespace MidSpace.ShipScan.SeModCore
     {
         #region fields
 
+        private bool _calledFirstFrame;
         private bool _isInitialized;
         private bool _isClientRegistered;
         private bool _isServerRegistered;
-        // TODO: see if we can have two _messageHandler's for server and client. This will be an issue for the MP Host, and Offline where one might be all that will register.
-        // TODO: I think I want to split the Commands in Client specific and Server specific, which would make this work.
-        private readonly Action<byte[]> _messageHandler = new Action<byte[]>(HandleMessage);
+        private readonly Action<byte[]> _clientMessageHandler = HandleClientMessage;
+        private readonly Action<byte[]> _serverMessageHandler = HandleServerMessage;
+
         //internal static MainChatCommandLogic Instance;
         public Timer DelayedConnectionRequestTimer;
         private bool _delayedConnectionRequest;
@@ -61,9 +62,14 @@ namespace MidSpace.ShipScan.SeModCore
         internal int ModCommunicationVersion;
 
         /// <summary>
-        /// The is the Id which this mod registers itself for sending and receiving messages through SE. 
+        /// The is the Id which this mod registers the server side for receiving messages through SE. 
         /// </summary>
-        internal ushort ConnectionId;
+        internal ushort ServerConnectionId;
+
+        /// <summary>
+        /// The is the Id which this mod registers the client side for receiving messages through SE. 
+        /// </summary>
+        internal ushort ClientConnectionId;
 
         internal LogEventType ClientLoggingLevel;
         internal string ClientLogFileName;
@@ -72,7 +78,7 @@ namespace MidSpace.ShipScan.SeModCore
         internal string ServerLogFileName;
 
         /// <summary>
-        ///  Used for filenames. Shouldn't have unfriendly characters.
+        ///  Used in logs, and might be used for filenames. Shouldn't have unfriendly characters.
         /// </summary>
         internal string ModName;
 
@@ -88,16 +94,40 @@ namespace MidSpace.ShipScan.SeModCore
         /// </summary>
         internal ulong[] ExperimentalCreatorList;
 
+        internal static MainChatCommandLogic Instance;
+        //internal static IChatCommandLogic Instance;
+
         #endregion
 
         #region IChatCommandLogic fields
 
-        internal static MainChatCommandLogic Instance;
-        //internal static IChatCommandLogic Instance;
-
         public abstract List<ChatCommand> GetAllChatCommands();
         public abstract ClientConfigBase GetConfig();
-        public abstract void InitModSettings(out int modCommunicationVersion, out ushort connectionId, out LogEventType clientLoggingLevel, out string clientLogFileName, out LogEventType serverLoggingLevel, out string serverLogFileName, out string modName, out string modTitle, out ulong[] experimentalCreatorList);
+
+        /// <summary>
+        /// This initializes most of the settings requied for your mod to run.
+        /// </summary>
+        /// <param name="modCommunicationVersion">This is used to indicate the base communication version.</param>
+        /// <param name="serverConnectionId"><para> The is the Id which this mod registers the server side for receiving messages through SE.</para>
+        /// <para>It should be unique in the world. If another mod shares the same number and both mods are loaded, you will have problems.</para>
+        /// <para>This cannot be the same as the <see cref="clientConnectionId"/>.</para></param>
+        /// <param name="serverLoggingLevel">The level of logging you which to do to the automatic logging file on the server.</param>
+        /// <param name="serverLogFileName">The name of the server logging file including extension. This will be written to the Storage path on the server.</param>
+        /// <param name="clientConnectionId"><para>The is the Id which this mod registers the client side for receiving messages through SE.</para>
+        /// <para>It should be unique in the world. If another mod shares the same number and both mods are loaded, you will have problems.</para>
+        /// <para>This cannot be the same as the <see cref="serverConnectionId"/>.</para></param>
+        /// <param name="clientLoggingLevel">The level of logging you which to do to the automatic logging file on the client.</param>
+        /// <param name="clientLogFileName">The name of the client logging file including extension. This will be written to the Storage path on the client.</param>
+        /// <param name="modName">Used in logs, and might be used for filenames. Shouldn't have unfriendly characters.</param>
+        /// <param name="modTitle">Used for display boxes and friendly information.</param>
+        /// <param name="experimentalCreatorList"><para>Hardcoded list of SteamIDs, for testing stuff that hasn't been released to the public yet.</para>
+        /// <para>It shouldn't be used to hide functionality away in the published mod, simply prevent incomplete or broken stuff from been used until it is ready.</para></param>
+        public abstract void InitModSettings(out int modCommunicationVersion, out ushort serverConnectionId, out LogEventType serverLoggingLevel, out string serverLogFileName, out ushort clientConnectionId, out LogEventType clientLoggingLevel, out string clientLogFileName, out string modName, out string modTitle, out ulong[] experimentalCreatorList);
+
+        /// <summary>
+        /// This is called on first frame on the Client that the mod is ready to run stuff.
+        /// </summary>
+        public virtual void FirstFrame() { }
 
         public virtual void UpdateBeforeFrame() { }
         public virtual void UpdateBeforeFrame100() { }
@@ -106,8 +136,18 @@ namespace MidSpace.ShipScan.SeModCore
 
         public virtual void ClientLoad() { }
         public virtual void ClientSave() { }
+
+        /// <summary>
+        /// This is run when the Client unloads. This is useful for detaching from event handlers that you don't want hanging around.
+        /// </summary>
+        public virtual void ClientUnload() { }
         public virtual void ServerLoad() { }
         public virtual void ServerSave() { }
+
+        /// <summary>
+        /// This is run when the Server unloads. This is useful for detaching from event handlers that you don't want hanging around.
+        /// </summary>
+        public virtual void ServerUnload() { }
 
 
         internal bool ResponseReceived { get; set; }
@@ -150,13 +190,15 @@ namespace MidSpace.ShipScan.SeModCore
 
         public sealed override void Init(MyObjectBuilder_SessionComponent sessionComponent)
         {
-            InitModSettings(out ModCommunicationVersion, out ConnectionId, out ClientLoggingLevel, out ClientLogFileName, out ServerLoggingLevel, out ServerLogFileName, out ModName, out ModTitle, out ExperimentalCreatorList);
-            Guard.IsNotZero(ModCommunicationVersion, "InitModSettings must supply ModCommunicationVersion");
-            Guard.IsNotZero(ConnectionId, "InitModSettings must supply ConnectionId");
-            Guard.IsNotEmpty(ClientLogFileName, "InitModSettings must supply ClientLogFileName");
-            Guard.IsNotEmpty(ServerLogFileName, "InitModSettings must supply ServerLogFileName");
-            Guard.IsNotEmpty(ModName, "InitModSettings must supply ModName");
-            Guard.IsNotEmpty(ModTitle, "InitModSettings must supply ModTitle");
+            InitModSettings(out ModCommunicationVersion, out ServerConnectionId, out ServerLoggingLevel, out ServerLogFileName, out ClientConnectionId, out ClientLoggingLevel, out ClientLogFileName, out ModName, out ModTitle, out ExperimentalCreatorList);
+            Guard.IsNotZero(ModCommunicationVersion, "SEModCore: InitModSettings must supply ModCommunicationVersion.");
+            Guard.IsNotZero(ServerConnectionId, "SEModCore: InitModSettings must supply ServerConnectionId.");
+            Guard.IsNotEmpty(ServerLogFileName, "SEModCore: InitModSettings must supply ServerLogFileName.");
+            Guard.IsNotZero(ClientConnectionId, "SEModCore: InitModSettings must supply ClientConnectionId.");
+            Guard.IsNotEmpty(ClientLogFileName, "SEModCore: InitModSettings must supply ClientLogFileName.");
+            Guard.IsNotEmpty(ModName, "SEModCore: InitModSettings must supply ModName.");
+            Guard.IsNotEmpty(ModTitle, "SEModCore: InitModSettings must supply ModTitle.");
+            Guard.IsNotEqual(ServerConnectionId, ClientConnectionId, $"SEModCore: ServerConnectionId [{ServerConnectionId}] and ClientConnectionId [{ClientConnectionId}] must not be the same.");
 
 
             //TextLogger.WriteGameLog($"####### {ModConfigurationConsts.ModName} INIT");
@@ -199,26 +241,23 @@ namespace MidSpace.ShipScan.SeModCore
             if (_isClientRegistered)
                 ClientLoad();
 
-            ServerLogger.WriteInfo($"{ModName} is ready.");
+            ServerLogger.WriteInfo($"{ModName} Server is ready.");
             // Client is only `ready` after it has received the ClientConfigResponse. We log that in MessageClientConfig.
         }
 
         private void InitClient()
         {
             _isClientRegistered = true;
-            ClientLogger.Init(ClientLogFileName, ClientLoggingLevel, false, 0); // comment this out if logging is not required for the Client.
+            ClientLogger.Init(ClientLogFileName, ClientLoggingLevel, false, MyAPIGateway.Session.OnlineMode.Equals(MyOnlineModeEnum.OFFLINE) ? 0 : 5); // comment this out if logging is not required for the Client.
             ClientLogger.WriteInfo($"{ModName} Client Log Started");
             ClientLogger.WriteInfo($"{ModName} Client Version {ModCommunicationVersion}");
-            if (ClientLogger.IsActive)
+            //if (ClientLogger.IsActive) // TODO: determine is this is needed any more?
                 TextLogger.WriteGameLog($"##Mod## {ModName} Client Logging File: {ClientLogger.LogFile}");
 
             MyAPIGateway.Utilities.MessageEntered += ChatMessageEntered;
 
-            if (MyAPIGateway.Multiplayer.MultiplayerActive && !_isServerRegistered) // if not the server, also need to register the messagehandler.
-            {
-                ClientLogger.WriteStart("RegisterMessageHandler");
-                MyAPIGateway.Multiplayer.RegisterMessageHandler(ConnectionId, _messageHandler);
-            }
+            ClientLogger.WriteStart("RegisterMessageHandler");
+            MyAPIGateway.Multiplayer.RegisterMessageHandler(ClientConnectionId, _clientMessageHandler);
 
             // Offline connections can be re-attempted quickly. Online games needs to wait longer.
             DelayedConnectionRequestTimer = new Timer(MyAPIGateway.Session.OnlineMode == MyOnlineModeEnum.OFFLINE ? 500 : 10000);
@@ -226,7 +265,7 @@ namespace MidSpace.ShipScan.SeModCore
             DelayedConnectionRequestTimer.Start();
 
             // let the server know we are ready for connections
-            MessageConnectionRequest.SendMessage(ModCommunicationVersion, PrivateCommunicationKey);
+            PullConnectionRequest.SendMessage(ModCommunicationVersion, PrivateCommunicationKey);
 
             ClientLogger.Flush();
         }
@@ -248,14 +287,14 @@ namespace MidSpace.ShipScan.SeModCore
         private void InitServer()
         {
             _isServerRegistered = true;
-            ServerLogger.Init(ServerLogFileName, ServerLoggingLevel, false, 0); // comment this out if logging is not required for the Server.
+            ServerLogger.Init(ServerLogFileName, ServerLoggingLevel, false, MyAPIGateway.Session.OnlineMode.Equals(MyOnlineModeEnum.OFFLINE) ? 0 : 5); // comment this out if logging is not required for the Server.
             ServerLogger.WriteInfo($"{ModName} Server Log Started");
             ServerLogger.WriteInfo($"{ModName} Server Version {ModCommunicationVersion}");
-            if (ServerLogger.IsActive)
+            //if (ServerLogger.IsActive) //if (ClientLogger.IsActive) // TODO: determine is this is needed any more?
                 TextLogger.WriteGameLog($"##Mod## {ModName} Server Logging File: {ServerLogger.LogFile}");
 
             ServerLogger.WriteStart("RegisterMessageHandler");
-            MyAPIGateway.Multiplayer.RegisterMessageHandler(ConnectionId, _messageHandler);
+            MyAPIGateway.Multiplayer.RegisterMessageHandler(ServerConnectionId, _serverMessageHandler);
 
             ServerLogger.Flush();
         }
@@ -274,7 +313,13 @@ namespace MidSpace.ShipScan.SeModCore
             {
                 ClientLogger.WriteInfo("Delayed Connection Request");
                 _delayedConnectionRequest = false;
-                MessageConnectionRequest.SendMessage(ModCommunicationVersion, PrivateCommunicationKey);
+                PullConnectionRequest.SendMessage(ModCommunicationVersion, PrivateCommunicationKey);
+            }
+
+            if (!_calledFirstFrame && IsConnected)
+            {
+                _calledFirstFrame = true;
+                FirstFrame();
             }
 
             UpdateBeforeFrame();
@@ -320,11 +365,10 @@ namespace MidSpace.ShipScan.SeModCore
                 if (MyAPIGateway.Utilities != null)
                     MyAPIGateway.Utilities.MessageEntered -= ChatMessageEntered;
 
-                if (!_isServerRegistered) // if not the server, also need to unregister the messagehandler.
-                {
-                    ClientLogger.WriteStop("UnregisterMessageHandler");
-                    MyAPIGateway.Multiplayer.UnregisterMessageHandler(ConnectionId, _messageHandler);
-                }
+                ClientLogger.WriteStop("UnregisterMessageHandler");
+                MyAPIGateway.Multiplayer.UnregisterMessageHandler(ClientConnectionId, _clientMessageHandler);
+
+                ClientUnload();
 
                 ClientLogger.WriteInfo("Log Closed");
                 ClientLogger.Terminate();
@@ -333,7 +377,9 @@ namespace MidSpace.ShipScan.SeModCore
             if (_isServerRegistered)
             {
                 ServerLogger.WriteStop("UnregisterMessageHandler");
-                MyAPIGateway.Multiplayer.UnregisterMessageHandler(ConnectionId, _messageHandler);
+                MyAPIGateway.Multiplayer.UnregisterMessageHandler(ServerConnectionId, _serverMessageHandler);
+
+                ServerUnload();
 
                 ServerLogger.WriteInfo("Log Closed");
                 ServerLogger.Terminate();
@@ -362,13 +408,69 @@ namespace MidSpace.ShipScan.SeModCore
 
         #region message processing
 
-        private static void HandleMessage(byte[] message)
+        private static void HandleServerMessage(byte[] rawData)
         {
-            if (Instance.IsServerRegistered)
-                Instance.ServerLogger.WriteVerbose("HandleMessage");
-            if (Instance.IsClientRegistered)
-                Instance.ClientLogger.WriteVerbose("HandleMessage");
-            ConnectionHelper.ProcessData(message);
+            Instance.ServerLogger.WriteStart("HandleMessage Start Deserialization");
+            PullMessageBase message;
+
+            try
+            {
+                message = MyAPIGateway.Utilities.SerializeFromBinary<PullMessageBase>(rawData);
+            }
+            catch (Exception ex)
+            {
+                Instance.ServerLogger.WriteException(ex, $"Message cannot Deserialize. Message length: {rawData.Length}");
+                if (ex.Message.IndexOf("No parameterless constructor", StringComparison.OrdinalIgnoreCase) >= 0)
+                    Instance.ServerLogger.WriteError("Make sure that any PullMessage that you defined, both inherits from PullMessageBase, and that PullMessageBase has a ProtoIncludeAttribute set for it.");
+
+                return;
+            }
+
+            Instance.ServerLogger.WriteStop("HandleMessage End Message Deserialization");
+
+            if (message != null)
+            {
+                try
+                {
+                    message.InvokeProcessing();
+                }
+                catch (Exception ex)
+                {
+                    Instance.ServerLogger.WriteException(ex, $"Processing message exception. Side: {message.Side}");
+                }
+            }
+        }
+
+        private static void HandleClientMessage(byte[] rawData)
+        {
+            Instance.ClientLogger.WriteStart("HandleMessage Start Message Deserialization");
+            PushMessageBase message;
+
+            try
+            {
+                message = MyAPIGateway.Utilities.SerializeFromBinary<PushMessageBase>(rawData);
+            }
+            catch (Exception ex)
+            {
+                Instance.ClientLogger.WriteException(ex, $"Message cannot Deserialize. Message length: {rawData.Length}");
+                if (ex.Message.IndexOf("No parameterless constructor", StringComparison.OrdinalIgnoreCase) >= 0)
+                    Instance.ServerLogger.WriteError("Make sure that any PushMessage that you defined, both inherits from PushMessageBase, and that PushMessageBase has a ProtoIncludeAttribute set for it.");
+                return;
+            }
+
+            Instance.ClientLogger.WriteStop("HandleMessage End Message Deserialization");
+
+            if (message != null)
+            {
+                try
+                {
+                    message.InvokeProcessing();
+                }
+                catch (Exception ex)
+                {
+                    Instance.ClientLogger.WriteException(ex, $"Processing message exception. Side: {message.Side}");
+                }
+            }
         }
 
         private void ChatMessageEntered(string messageText, ref bool sendToOthers)

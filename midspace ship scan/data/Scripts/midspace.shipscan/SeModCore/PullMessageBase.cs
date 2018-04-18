@@ -4,18 +4,14 @@
     using Messages;
     using ProtoBuf;
 
+    /// <summary>
+    /// This is for sending messages from Client to Server, where the Server will process them upon receipt.
+    /// </summary>
     [ProtoContract]
-    [ProtoInclude(50, typeof(MessageChatCommand))]
-    [ProtoInclude(51, typeof(MessageClientDialogMessage))]
-    [ProtoInclude(52, typeof(MessageClientNotification))]
-    [ProtoInclude(53, typeof(MessageClientTextMessage))]
-    [ProtoInclude(54, typeof(MessageConnectionRequest))]
-    [ProtoInclude(55, typeof(MessageConnectionResponse))]
-    [ProtoInclude(56, typeof(MessageClientSound))]
-    [ProtoInclude(57, typeof(MessageClientConfig))]
-
-    // This contains the ModCore Messages. Modder programmers should add their own Messages to the other Partial class.
-    public abstract partial class ModMessageBase
+    // These are the ModCore Pull Messages. Modder programmers should add their own Messages to the other Partial class.
+    [ProtoInclude(50, typeof(PullChatCommand))]
+    [ProtoInclude(51, typeof(PullConnectionRequest))]
+    public abstract partial class PullMessageBase
     {
         #region properties
 
@@ -58,35 +54,7 @@
 
         public void InvokeProcessing()
         {
-            switch (Side)
-            {
-                case MessageSide.ClientSide:
-                    InvokeClientProcessing();
-                    break;
-
-                case MessageSide.ServerSide:
-                    InvokeServerProcessing();
-                    break;
-            }
-        }
-
-        private void InvokeClientProcessing()
-        {
-            MainChatCommandLogic.Instance.ClientLogger.WriteVerbose("Received - {0}", this.GetType().Name);
-            try
-            {
-                ProcessClient();
-            }
-            catch (Exception ex)
-            {
-                // TODO: send error to server and notify admins
-                MainChatCommandLogic.Instance.ClientLogger.WriteException(ex, "Could not process message on Client.");
-            }
-        }
-
-        private void InvokeServerProcessing()
-        {
-            MainChatCommandLogic.Instance.ServerLogger.WriteVerbose("Received - {0}", this.GetType().Name);
+            MainChatCommandLogic.Instance.ServerLogger.WriteVerbose("Received -> {0}", this.GetType().Name);
             try
             {
                 ProcessServer();
@@ -96,11 +64,6 @@
                 MainChatCommandLogic.Instance.ServerLogger.WriteException(ex, "Could not process message on Server.");
             }
         }
-
-        /// <summary>
-        /// When the message is recieved on the Client side, it will invoke this method.
-        /// </summary>
-        public abstract void ProcessClient();
 
         /// <summary>
         /// When the message is recieved on the Server side, it will invoke this method.

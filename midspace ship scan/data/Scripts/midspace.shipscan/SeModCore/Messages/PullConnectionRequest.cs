@@ -5,18 +5,13 @@
     using VRage.Game.ModAPI;
 
     [ProtoContract]
-    public class MessageConnectionRequest : ModMessageBase
+    public class PullConnectionRequest : PullMessageBase
     {
         [ProtoMember(201)]
         public int ModCommunicationVersion { get; set; }
 
         [ProtoMember(202)]
         public long PrivateCommunicationKey { get; set; }
-
-        public override void ProcessClient()
-        {
-            // never processed on client
-        }
 
         public override void ProcessServer()
         {
@@ -45,13 +40,13 @@
             uint userSecurity = player.UserSecurityLevel();
 
             // Is Server version older than what Client is running, or Server version is newer than Client.
-            MessageConnectionResponse.SendMessage(SenderSteamId, ModCommunicationVersion, MainChatCommandLogic.Instance.ModCommunicationVersion, userSecurity);
+            PushConnectionResponse.SendMessage(SenderSteamId, ModCommunicationVersion, MainChatCommandLogic.Instance.ModCommunicationVersion, userSecurity);
         }
 
         public static void SendMessage(int modCommunicationVersion, long privateCommunicationKey)
         {
             MainChatCommandLogic.Instance.ClientLogger.WriteInfo("Sending Connection Request");
-            ConnectionHelper.SendMessageToServer(new MessageConnectionRequest
+            ConnectionHelper.SendMessageToServer(new PullConnectionRequest
             {
                 ModCommunicationVersion = modCommunicationVersion,
                 PrivateCommunicationKey = privateCommunicationKey

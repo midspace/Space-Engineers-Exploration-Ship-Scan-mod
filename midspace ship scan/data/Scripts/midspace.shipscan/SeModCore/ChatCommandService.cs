@@ -117,7 +117,7 @@
                 return false;
 
             var comandList = Commands.Where(k => k.Value.Commands.Any(a => a.Equals(commands[0], StringComparison.InvariantCultureIgnoreCase)));
-            foreach (var command in comandList)
+            foreach (KeyValuePair<string, ChatCommand> command in comandList)
             {
                 //if (MainChatCommandLogic.Instance.BlockCommandExecution)
                 //{
@@ -181,20 +181,20 @@
                     }
                     catch (Exception ex)
                     {
+                        MainChatCommandLogic.Instance.ClientLogger.WriteException(ex, $"Occurred attempting to run {command.Value.GetType().Name} '{command.Key}' ");
+
                         // Exception handling to prevent any crash in the ChatCommand's reaching the user.
                         // Additional information for developers
                         if (MyAPIGateway.Session.Player.IsExperimentalCreator())
                         {
                             MyAPIGateway.Utilities.ShowMissionScreen($"Error in {command.Value.Name}", "Input: ", messageText, ex.ToString());
-                            VRage.Utils.MyLog.Default.WriteLine($"##Mod## Admin Helper mod Exception caught. Message: {ex}");
+                            TextLogger.WriteGameLog($"##Mod## {MainChatCommandLogic.Instance.ModName} Exception caught. Message: {ex}");
                             continue;
                         }
 
                         var message = ex.Message.Replace("\r", " ").Replace("\n", " ");
                         message = message.Substring(0, Math.Min(message.Length, 50));
-                        MyAPIGateway.Utilities.ShowMessage("Error", "Occured attempting to run {0}.\r\n{1}", command, message);
-
-                        MainChatCommandLogic.Instance.ClientLogger.WriteException(ex, $"Occured attempting to run {command}");
+                        MyAPIGateway.Utilities.ShowMessage("Error", "Occurred attempting to run {0} '{1}'.\r\n{2}", command.Value.GetType().Name, command.Key, message);
                     }
                 }
                 else if (command.Value.HasFlag(ChatCommandAccessibility.Server))
@@ -202,7 +202,7 @@
                     //MyAPIGateway.Utilities.ShowMessage("CHECK", "Command Server: {0}", command.Value.Flag);
 
                     // Send message to server to process.
-                    MessageChatCommand.SendMessage(MyAPIGateway.Session.Player.IdentityId, messageText);
+                    PullChatCommand.SendMessage(MyAPIGateway.Session.Player.IdentityId, messageText);
                     return true;
                 }
                 else
@@ -276,18 +276,20 @@
                     }
                     catch (Exception ex)
                     {
+                        MainChatCommandLogic.Instance.ServerLogger.WriteException(ex, $"Occurred attempting to run {command.Value.GetType().Name} '{command.Key}' ");
+
                         // Exception handling to prevent any crash in the ChatCommand's reaching the user.
                         // Additional information for developers
                         if (MainChatCommandLogic.Instance.ExperimentalCreatorList.Contains(steamId))
                         {
                             MyAPIGateway.Utilities.SendMissionScreen(steamId, $"Error in {command.Value.Name}", "Input: ", messageText, ex.ToString());
-                            VRage.Utils.MyLog.Default.WriteLine($"##Mod## Admin Helper mod Exception caught. Message: {ex}");
+                            TextLogger.WriteGameLog($"##Mod## {MainChatCommandLogic.Instance.ModName} Exception caught. Message: {ex}");
                             continue;
                         }
 
                         var message = ex.Message.Replace("\r", " ").Replace("\n", " ");
                         message = message.Substring(0, Math.Min(message.Length, 50));
-                        MyAPIGateway.Utilities.SendMessage(steamId, "Error", "Occured attempting to run {0}.\r\n{1}", command, message);
+                        MyAPIGateway.Utilities.SendMessage(steamId, "Error", "Occurred attempting to run {0} '{1}'.\r\n{2}", command.Value.GetType().Name, command.Key,  message);
                     }
                 }
                 else

@@ -90,14 +90,17 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="SeModCore\Guard.cs" />
-    <Compile Include="SeModCore\Messages\MessageClientSound.cs" />
-    <Compile Include="SeModCore\Messages\MessageClientConfig.cs" />
-    <Compile Include="SeModCore\Messages\MessageChatCommand.cs" />
-    <Compile Include="SeModCore\Messages\MessageClientDialogMessage.cs" />
-    <Compile Include="SeModCore\Messages\MessageClientNotification.cs" />
-    <Compile Include="SeModCore\Messages\MessageClientTextMessage.cs" />
-    <Compile Include="SeModCore\Messages\MessageConnectionRequest.cs" />
-    <Compile Include="SeModCore\Messages\MessageConnectionResponse.cs" />
+    <Compile Include="SeModCore\PullMessageBase.cs" />
+    <Compile Include="SeModCore\PushMessageBase.cs" />
+    <Compile Include="SeModCore\Messages\PushClientSound.cs" />
+    <Compile Include="SeModCore\Messages\PushClientConfig.cs" />
+    <Compile Include="SeModCore\Messages\PushChatCommand.cs" />
+    <Compile Include="SeModCore\Messages\PushClientDialogMessage.cs" />
+    <Compile Include="SeModCore\Messages\PushClientNotification.cs" />
+    <Compile Include="SeModCore\Messages\PushClientTextMessage.cs" />
+    <Compile Include="SeModCore\Messages\PullChatCommand.cs" />
+    <Compile Include="SeModCore\Messages\PullConnectionRequest.cs" />
+    <Compile Include="SeModCore\Messages\PushConnectionResponse.cs" />
     <Compile Include="SeModCore\ChatCommand.cs" />
     <Compile Include="SeModCore\ChatCommandService.cs" />
     <Compile Include="SeModCore\ConnectionHelper.cs" />
@@ -106,11 +109,11 @@
     <Compile Include="SeModCore\MainChatCommandLogic.cs" />
     <Compile Include="SeModCore\ModCoreConsts.cs" />
     <Compile Include="SeModCore\ModCoreExtensions.cs" />
-    <Compile Include="SeModCore\ModMessageBase.cs" />
     <Compile Include="SeModCore\TextLogger.cs" />
-    <Compile Include="Messages\MessageClearScan.cs" />
-    <Compile Include="Messages\MessageSetTrack.cs" />
-    <Compile Include="Messages\MessageInitiateScan.cs" />
+    <Compile Include="Messages\PullClearScan.cs" />
+    <Compile Include="Messages\PullInitiateScan.cs" />
+    <Compile Include="Messages\PullSetTrack.cs" />
+    <Compile Include="Messages\PushSetTrack.cs" />
     <Compile Include="Messages\ModMessageBaseList.cs" />
     <Compile Include="Commands\CommandHelp.cs" />
     <Compile Include="Commands\CommandScanClear.cs" />
@@ -122,7 +125,7 @@
     <Compile Include="Entities\TrackDetailEntity.cs" />
     <Compile Include="Entities\TrackGpsEntity.cs" />
     <Compile Include="Helpers\Extensions.cs" />
-    <Compile Include="Helpers\SerializableMatrix.cs" />
+    <Compile Include="Entities\SerializableMatrixD.cs" />
     <Compile Include="Helpers\ShipGridExtension.cs" />
     <Compile Include="Helpers\Support.cs" />
     <Compile Include="ClientConfig.cs" />
@@ -137,7 +140,12 @@
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Messages\PullFromClientToServer.txt" />
+    <Content Include="Messages\PushFromServerToClient.txt" />
+    <Content Include="SeModCore\Messages\PullFromClientToServer.txt" />
+    <Content Include="SeModCore\Messages\PushFromServerToClient.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>rmdir /Q /S "$(ProjectDir)obj\"

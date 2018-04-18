@@ -1,4 +1,4 @@
-﻿// Do not change the nmespace. This must match the namespace of the other ModMessageBase class for it to work.
+﻿// Do not change the namespace. This must match the namespace of the other ModMessageBase class for it to work.
 namespace MidSpace.ShipScan.SeModCore
 {
     using System.Xml.Serialization;
@@ -9,12 +9,26 @@ namespace MidSpace.ShipScan.SeModCore
     // ALL CLASSES DERIVED FROM MessageBase MUST BE ADDED HERE
     //[XmlInclude(typeof(....))]
 
+    /// <summary>
+    /// This is for sending messages from Client to Server, where the Server will process them upon receipt.
+    /// </summary>
     // Modder programmers should add their own Messages here.
     // ProtoInclude tags needs to start from 100.
-    [ProtoInclude(101, typeof(MessageInitiateScan))]
-    [ProtoInclude(102, typeof(MessageClearScan))]
-    [ProtoInclude(104, typeof(MessageSetTrack))]
-    public abstract partial class ModMessageBase
+    [ProtoInclude(100, typeof(PullClearScan))]
+    [ProtoInclude(101, typeof(PullInitiateScan))]
+    [ProtoInclude(102, typeof(PullSetTrack))]
+    public abstract partial class PullMessageBase
+    {
+        // this is left empty.
+    }
+
+    /// <summary>
+    /// This is for sending messages from Server to Client, where the Client will process them upon receipt.
+    /// </summary>
+    // Modder programmers should add their own Messages here.
+    // ProtoInclude tags needs to start from 100.
+    [ProtoInclude(100, typeof(PushSetTrack))]
+    public abstract partial class PushMessageBase
     {
         // this is left empty.
     }

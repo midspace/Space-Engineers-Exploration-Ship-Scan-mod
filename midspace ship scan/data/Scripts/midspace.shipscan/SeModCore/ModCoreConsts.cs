@@ -99,4 +99,52 @@
         /// </summary>
         Server = 0x10
     }
+
+    /// <summary>
+    /// Identifies the type of event that has caused the log item.
+    /// </summary>
+    public enum LogEventType
+    {
+        None = 0,
+
+        /// <summary>
+        /// Fatal error or application crash.
+        /// </summary>
+        Critical = 1,
+
+        /// <summary>
+        /// Recoverable error.
+        /// </summary>
+        Error = 2,
+
+        /// <summary>
+        /// Noncritical problem.
+        /// </summary>
+        Warning = 4,
+
+        /// <summary>
+        /// Informational message.
+        /// </summary>
+        Information = 8,
+
+        /// <summary>
+        /// Starting of a logical operation.
+        /// </summary>
+        Start = 128,
+
+        /// <summary>
+        /// Stopping of a logical operation.
+        /// </summary>
+        Stop = 256,
+
+        /// <summary>
+        /// Debugging trace.
+        /// </summary>
+        Verbose = 512,
+
+        /// <summary>
+        /// All details.
+        /// </summary>
+        All = 4096
+    }
 }

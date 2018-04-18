@@ -6,7 +6,7 @@
     /// This handles the receiving the custom ClientConfig.
     /// </summary>
     [ProtoContract]
-    public class MessageClientConfig : ModMessageBase
+    public class PushClientConfig : PushMessageBase
     {
         [ProtoMember(101)]
         public ClientConfigBase ClientConfigResponse { get; set; }
@@ -17,12 +17,7 @@
 
             // stop further requests
             MainChatCommandLogic.Instance.CancelClientConnection();
-            MainChatCommandLogic.Instance.ClientLogger.WriteInfo($"{MainChatCommandLogic.Instance.ModName} is ready.");
-        }
-
-        public override void ProcessServer()
-        {
-            // never processed on server
+            MainChatCommandLogic.Instance.ClientLogger.WriteInfo($"{MainChatCommandLogic.Instance.ModName} Client is ready.");
         }
     }
 }

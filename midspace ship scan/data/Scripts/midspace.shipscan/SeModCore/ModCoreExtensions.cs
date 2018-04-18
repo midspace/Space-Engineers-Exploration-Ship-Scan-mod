@@ -95,7 +95,7 @@ namespace MidSpace.ShipScan.SeModCore
             if (steamId == MyAPIGateway.Multiplayer.ServerId || (MyAPIGateway.Session.Player != null && steamId == MyAPIGateway.Session.Player.SteamUserId))
                 utilities.ShowMessage(sender, messageText, args);
             else
-                MessageClientTextMessage.SendMessage(steamId, sender, messageText, args);
+                PushClientTextMessage.SendMessage(steamId, sender, messageText, args);
         }
 
         public static void SendMissionScreen(this IMyUtilities utilities, ulong steamId, string screenTitle = null, string currentObjectivePrefix = null, string currentObjective = null, string screenDescription = null, Action<ResultEnum> callback = null, string okButtonCaption = null)
@@ -103,7 +103,7 @@ namespace MidSpace.ShipScan.SeModCore
             if (steamId == MyAPIGateway.Multiplayer.ServerId || (MyAPIGateway.Session.Player != null && steamId == MyAPIGateway.Session.Player.SteamUserId))
                 utilities.ShowMissionScreen(screenTitle, currentObjectivePrefix, currentObjective, screenDescription, callback, okButtonCaption);
             else
-                MessageClientDialogMessage.SendMessage(steamId, screenTitle, currentObjectivePrefix, screenDescription);
+                PushClientDialogMessage.SendMessage(steamId, screenTitle, currentObjectivePrefix, screenDescription);
         }
 
         #endregion

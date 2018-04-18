@@ -20,7 +20,7 @@
     /// This will process and run the scan, then return the results to the player.
     /// </summary>
     [ProtoContract]
-    public class MessageInitiateScan : SeModCore.ModMessageBase
+    public class PullInitiateScan : SeModCore.PullMessageBase
     {
         #region properties
 
@@ -37,21 +37,16 @@
         public ScanType DisplayType;
 
         [ProtoMember(203)]
-        public SerializableMatrix PlayerPositionMatrix;
+        public SerializableMatrixD PlayerPositionMatrix;
 
         [ProtoMember(204)]
         public long ControlledEntityId;
 
         #endregion
 
-        public static void SendMessage(decimal minRange, ScanType displayType, SerializableMatrix playerPositionMatrix, long controlledEntityId)
+        public static void SendMessage(decimal minRange, ScanType displayType, SerializableMatrixD playerPositionMatrix, long controlledEntityId)
         {
-            ConnectionHelper.SendMessageToServer(new MessageInitiateScan { MinRange = minRange, DisplayType = displayType, PlayerPositionMatrix = playerPositionMatrix, ControlledEntityId = controlledEntityId });
-        }
-
-        public override void ProcessClient()
-        {
-            // never processed on client
+            ConnectionHelper.SendMessageToServer(new PullInitiateScan { MinRange = minRange, DisplayType = displayType, PlayerPositionMatrix = playerPositionMatrix, ControlledEntityId = controlledEntityId });
         }
 
         public override void ProcessServer()

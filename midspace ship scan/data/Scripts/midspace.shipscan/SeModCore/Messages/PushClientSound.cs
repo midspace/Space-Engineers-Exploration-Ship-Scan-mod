@@ -13,7 +13,7 @@
     /// Example: MessageClientSound.SendMessage(SenderSteamId, "SoundBlockObjectiveComplete");
     /// </summary>
     [ProtoContract]
-    public class MessageClientSound : ModMessageBase
+    public class PushClientSound : PushMessageBase
     {
         [ProtoMember(201)]
         public string CueName;
@@ -46,11 +46,6 @@
             _emitter.PlaySound(soundId, true, false, true, false, false);
         }
 
-        public override void ProcessServer()
-        {
-            // never processed on server.
-        }
-
         /// <summary>
         /// Plays the specified Audio cue from the Audio.sbc definitions to the specifed player.
         /// This is called by the server side to run on the client.
@@ -60,11 +55,11 @@
         /// <param name="volume">The audio volume.</param>
         public static void SendMessage(ulong steamId, string cueName, float volume = 1.0f)
         {
-            ConnectionHelper.SendMessageToPlayer(steamId, new MessageClientSound { CueName = cueName, Volume = volume });
+            ConnectionHelper.SendMessageToPlayer(steamId, new PushClientSound { CueName = cueName, Volume = volume });
         }
 
         /// <summary>
-        /// Play sound from particular location. Example economy LCD when trade zone detected - not working yet 
+        /// Play sound from particular location. - not working yet 
         /// Code created with assistance of Digi.
         /// </summary>
         /// <param name="soundName"></param>
@@ -112,7 +107,7 @@
 
         /// <summary>
         /// place a file in mods called PR.xwm  and it should play from Pirate Radio test in sound block
-        /// OR plays any wave file located in %appdata%/SpaceEngineers/Storage/504209260.sbm_Economy.scripts/ named Test.wav with following code
+        /// OR plays any wave file located in mod's storage folder like "Test.wav" with following code
         /// </summary>
         /// <param name="filename"></param>
         /// <param name="volume"></param>
@@ -123,10 +118,10 @@
             if (controlled == null)
                 return; // don't continue if session is not ready or player does not control anything.
 
-            if (!MyAPIGateway.Utilities.FileExistsInLocalStorage(filename, typeof(MessageClientSound)))
+            if (!MyAPIGateway.Utilities.FileExistsInLocalStorage(filename, typeof(PushClientSound)))
                 return; // File doesn't exist.
 
-            using (BinaryReader reader = MyAPIGateway.Utilities.ReadBinaryFileInLocalStorage(filename, typeof(MessageClientSound)))
+            using (BinaryReader reader = MyAPIGateway.Utilities.ReadBinaryFileInLocalStorage(filename, typeof(PushClientSound)))
             {
                 const int hz = 92000; // I don't even?!
                 var bytes = reader.ReadBytes((int)reader.BaseStream.Length);

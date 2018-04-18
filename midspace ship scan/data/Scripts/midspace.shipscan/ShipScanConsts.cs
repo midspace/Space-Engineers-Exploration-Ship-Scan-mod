@@ -19,7 +19,7 @@
         /// communications classes. A Player will connect to the server, and will automatically download version 2.
         /// We would now have a Client running newer communication classes trying to talk to the Server with older classes.
         /// </remarks>
-        internal const int ModCommunicationVersion = 20180415; // This will be based on the date of update.
+        internal const int ModCommunicationVersion = 20180417; // This will be based on the date of update.
 
         /// <summary>
         /// The is the Id which this mod registers itself for sending and receiving messages through SE. 
@@ -29,7 +29,8 @@
         /// messages to/from the other registered mod by mistake, and potentially cause SE to crash.
         /// This has been generated randomly.
         /// </remarks>
-        internal const ushort ConnectionId = 13675;
+        internal const ushort ServerConnectionId = 13675;
+        internal const ushort ClientConnectionId = 13676;
 
         internal static readonly LogEventType ClientLoggingLevel = MyAPIGateway.Session.OnlineMode == MyOnlineModeEnum.OFFLINE ? LogEventType.All : LogEventType.Information;
         internal const string ClientLogFileName = "ShipScanClient.Log";

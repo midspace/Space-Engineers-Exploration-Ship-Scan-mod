@@ -4,7 +4,7 @@
     using Sandbox.ModAPI;
 
     [ProtoContract]
-    public class MessageClientTextMessage : ModMessageBase
+    public class PushClientTextMessage : PushMessageBase
     {
         [ProtoMember(201)]
         public string Prefix;
@@ -17,11 +17,6 @@
             MyAPIGateway.Utilities.ShowMessage(Prefix, Content);
         }
 
-        public override void ProcessServer()
-        {
-            // never processed on server.
-        }
-
         public static void SendMessage(ulong steamId, string prefix, string content, params object[] args)
         {
             string message;
@@ -30,7 +25,7 @@
             else
                 message = string.Format(content, args);
 
-            ConnectionHelper.SendMessageToPlayer(steamId, new MessageClientTextMessage { Prefix = prefix, Content = message });
+            ConnectionHelper.SendMessageToPlayer(steamId, new PushClientTextMessage { Prefix = prefix, Content = message });
         }
     }
 }

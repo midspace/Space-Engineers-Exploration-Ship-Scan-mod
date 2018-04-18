@@ -88,7 +88,7 @@ namespace MidSpace.ShipScan
                             var relation = _programmableBlockEntity.GetUserRelationToOwner(player.IdentityId);
                             if (relation == MyRelationsBetweenPlayerAndBlock.Owner || relation == MyRelationsBetweenPlayerAndBlock.FactionShare)
                             {
-                                ConnectionHelper.SendMessageToPlayer(player.SteamUserId, new MessageChatCommand { IdentityId = player.IdentityId, TextCommand = data });
+                                ConnectionHelper.SendMessageToPlayer(player.SteamUserId, new PushChatCommand { IdentityId = player.IdentityId, TextCommand = data });
                                 return;
                             }
                         }

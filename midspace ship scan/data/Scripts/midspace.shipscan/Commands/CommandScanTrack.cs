@@ -1,12 +1,12 @@
 ﻿namespace MidSpace.ShipScan.Commands
 {
-    using System;
-    using System.Text.RegularExpressions;
     using Entities;
     using Helpers;
     using Messages;
     using Sandbox.ModAPI;
     using SeModCore;
+    using System;
+    using System.Text.RegularExpressions;
     using VRage.Game;
     using VRage.Game.ModAPI;
     using VRage.Game.ModAPI.Interfaces;
@@ -37,11 +37,11 @@
 
             if (match.Success)
             {
-                MessageSetTrack.SendMessage(match.Groups["Key"].Value);
+                PullSetTrack.SendMessage(match.Groups["Key"].Value);
                 return true;
             }
 
-            MessageSetTrack.SendMessage(null);
+            PullSetTrack.SendMessage(null);
             return true;
         }
 
@@ -127,7 +127,7 @@
                     _isTracking = false;
                     MyAPIGateway.Utilities.ShowNotification("Cockpit changed - tracking cancelled", 2500, MyFontEnum.Red);
                     ClearHudObjective();
-                    MessageClearScan.SendMessage(ScanType.ChatConsole);
+                    PullClearScan.SendMessage(ScanType.ChatConsole);
                     return;
                 }
 

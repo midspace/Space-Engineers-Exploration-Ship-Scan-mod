@@ -28,14 +28,15 @@
     {
         public ScanServerEntity ServerData;
 
-        public override void InitModSettings(out int modCommunicationVersion, out ushort connectionId, out LogEventType clientLoggingLevel, out string clientLogFileName, out LogEventType serverLoggingLevel, out string serverLogFileName, out string modName, out string modTitle, out ulong[] experimentalCreatorList)
+        public override void InitModSettings(out int modCommunicationVersion, out ushort serverConnectionId, out LogEventType serverLoggingLevel, out string serverLogFileName, out ushort clientConnectionId, out LogEventType clientLoggingLevel, out string clientLogFileName, out string modName, out string modTitle, out ulong[] experimentalCreatorList)
         {
             modCommunicationVersion = ShipScanConsts.ModCommunicationVersion;
-            connectionId = ShipScanConsts.ConnectionId;
-            clientLoggingLevel = ShipScanConsts.ClientLoggingLevel;
-            clientLogFileName = ShipScanConsts.ClientLogFileName;
+            serverConnectionId = ShipScanConsts.ServerConnectionId;
             serverLoggingLevel = ShipScanConsts.ServerLoggingLevel;
             serverLogFileName = ShipScanConsts.ServerLogFileName;
+            clientConnectionId = ShipScanConsts.ClientConnectionId;
+            clientLoggingLevel = ShipScanConsts.ClientLoggingLevel;
+            clientLogFileName = ShipScanConsts.ClientLogFileName;
             modName = ShipScanConsts.ModName;
             modTitle = ShipScanConsts.ModTitle;
             experimentalCreatorList = ShipScanConsts.ExperimentalCreatorList;

@@ -54,7 +54,7 @@
         /// <param name="filename"></param>
         /// <param name="loggingLevel"></param>
         /// <param name="addTimestamp"></param>
-        /// <param name="delayedWrite"></param>
+        /// <param name="delayedWrite">This will specify how many record to delay writing to the log file, to reduce I/O. Setting 0 will write instantly.</param>
         public void Init(string filename, LogEventType loggingLevel, bool addTimestamp = false, int delayedWrite = 0)
         {
             _isInitialized = true;
@@ -74,6 +74,8 @@
         //}
 
         #endregion
+
+        #region Write methods
 
         public void WriteStart(string text, params object[] args)
         {
@@ -138,7 +140,7 @@
             if (!_isInitialized)
                 return;
 
-            // we create the writer when it is needed to prevent the creation of empty files
+            // we create the writer only when it is needed to prevent the creation of empty files.
             if (_logWriter == null)
             {
                 try
@@ -171,6 +173,20 @@
             }
         }
 
+        public static void WriteGameLog(string text, params object[] args)
+        {
+            string message = text;
+            if (args != null && args.Length != 0)
+                message = string.Format(text, args);
+
+            if (MyAPIGateway.Utilities != null && MyAPIGateway.Utilities.IsDedicated)
+                VRage.Utils.MyLog.Default.WriteLineAndConsole(message);
+            else
+                VRage.Utils.MyLog.Default.WriteLine(message);
+        }
+
+        #endregion
+
         public void Flush()
         {
             if (!_isInitialized)
@@ -200,66 +216,5 @@
                 }
             }
         }
-
-        public static void WriteGameLog(string text, params object[] args)
-        {
-            string message = text;
-            if (args != null && args.Length != 0)
-                message = string.Format(text, args);
-
-            if (MyAPIGateway.Utilities != null && MyAPIGateway.Utilities.IsDedicated)
-                VRage.Utils.MyLog.Default.WriteLineAndConsole(message);
-            else
-                VRage.Utils.MyLog.Default.WriteLine(message);
-        }
     }
-
-    /// <summary>
-    /// Identifies the type of event that has caused the log item.
-    /// </summary>
-    public enum LogEventType
-    {
-        None = 0,
-
-        /// <summary>
-        /// Fatal error or application crash.
-        /// </summary>
-        Critical = 1,
-
-        /// <summary>
-        /// Recoverable error.
-        /// </summary>
-        Error = 2,
-
-        /// <summary>
-        /// Noncritical problem.
-        /// </summary>
-        Warning = 4,
-
-        /// <summary>
-        /// Informational message.
-        /// </summary>
-        Information = 8,
-
-        /// <summary>
-        /// Starting of a logical operation.
-        /// </summary>
-        Start = 128,
-
-        /// <summary>
-        /// Stopping of a logical operation.
-        /// </summary>
-        Stop = 256,
-
-        /// <summary>
-        /// Debugging trace.
-        /// </summary>
-        Verbose = 512,
-
-        /// <summary>
-        /// All details.
-        /// </summary>
-        All = 4096
-    }
-
 }

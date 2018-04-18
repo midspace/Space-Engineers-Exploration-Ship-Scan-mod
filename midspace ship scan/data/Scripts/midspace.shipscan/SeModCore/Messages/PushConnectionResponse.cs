@@ -10,7 +10,7 @@
     /// This is so that version information is always passed intact.
     /// </summary>
     [ProtoContract]
-    public class MessageConnectionResponse : ModMessageBase
+    public class PushConnectionResponse : PushMessageBase
     {
         [ProtoMember(203)]
         public bool IsOldCommunicationVersion;
@@ -23,7 +23,7 @@
 
         public static void SendMessage(ulong steamdId, int clientModCommunicationVersion, int serverModCommunicationVersion, uint userSecurity)
         {
-            ConnectionHelper.SendMessageToPlayer(steamdId, new MessageConnectionResponse
+            ConnectionHelper.SendMessageToPlayer(steamdId, new PushConnectionResponse
             {
                 IsOldCommunicationVersion = clientModCommunicationVersion < serverModCommunicationVersion,
                 IsNewCommunicationVersion = clientModCommunicationVersion > serverModCommunicationVersion,
@@ -36,7 +36,7 @@
             // This is the purpose of the ModCommunicationVersion. So that it can be passed safely, and thus disable the
             // mod client side if the server hasn't yet been restarted with the updated mod.
 
-            ConnectionHelper.SendMessageToPlayer(steamdId, new MessageClientConfig { ClientConfigResponse = MainChatCommandLogic.Instance.GetConfig() });
+            ConnectionHelper.SendMessageToPlayer(steamdId, new PushClientConfig { ClientConfigResponse = MainChatCommandLogic.Instance.GetConfig() });
         }
 
         public override void ProcessClient()
@@ -83,11 +83,6 @@
 
             MainChatCommandLogic.Instance.IsConnected = isConnected;
             MainChatCommandLogic.Instance.ResponseReceived = true;
-        }
-
-        public override void ProcessServer()
-        {
-            // never processed on server
         }
     }
 }

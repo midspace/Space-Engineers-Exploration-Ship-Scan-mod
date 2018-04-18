@@ -8,7 +8,7 @@
     /// one, so we can serialize with ProtoBuf to a binary stream.
     /// </summary>
     [ProtoContract]
-    public class SerializableMatrix
+    public class SerializableMatrixD
     {
         #region fields
 
@@ -110,11 +110,11 @@
 
         #endregion
 
-        public SerializableMatrix()
+        public SerializableMatrixD()
         {
         }
 
-        public SerializableMatrix(MatrixD matrix)
+        public SerializableMatrixD(MatrixD matrix)
         {
             M11 = matrix.M11;
             M12 = matrix.M12;
@@ -134,16 +134,53 @@
             M44 = matrix.M44;
         }
 
-        public static implicit operator SerializableMatrix(MatrixD matrix)
+        public static implicit operator SerializableMatrixD(MatrixD matrix)
         {
-            return new SerializableMatrix(matrix);
+            return new SerializableMatrixD(matrix);
         }
 
-        public static implicit operator MatrixD(SerializableMatrix v)
+        public static implicit operator MatrixD(SerializableMatrixD v)
         {
             if (v == null)
                 return new MatrixD();
             return new MatrixD(v.M11, v.M12, v.M13, v.M14, v.M21, v.M22, v.M23, v.M24, v.M31, v.M32, v.M33, v.M34, v.M41, v.M42, v.M43, v.M44);
         }
+
+        public Vector3D Translation
+        {
+            get
+            {
+                Vector3D result = default(Vector3D);
+                result.X = M41;
+                result.Y = M42;
+                result.Z = M43;
+                return result;
+            }
+            set
+            {
+                M41 = value.X;
+                M42 = value.Y;
+                M43 = value.Z;
+            }
+        }
+
+        public Vector3D Left
+        {
+            get
+            {
+                Vector3D result = default(Vector3D);
+                result.X = 0.0 - M11;
+                result.Y = 0.0 - M12;
+                result.Z = 0.0 - M13;
+                return result;
+            }
+            set
+            {
+                M11 = 0.0 - value.X;
+                M12 = 0.0 - value.Y;
+                M13 = 0.0 - value.Z;
+            }
+        }
+
     }
 }
