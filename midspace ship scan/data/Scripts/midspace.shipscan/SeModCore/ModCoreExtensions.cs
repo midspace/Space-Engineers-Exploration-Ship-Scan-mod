@@ -75,7 +75,7 @@ namespace MidSpace.ShipScan.SeModCore
         /// <returns></returns>
         public static bool IsExperimentalCreator(this IMyPlayer player)
         {
-            return MainChatCommandLogic.Instance.ExperimentalCreatorList.Contains(player.SteamUserId);
+            return MainChatCommandLogic.Instance.ExperimentalCreatorList.Any(e => e == player.SteamUserId);
         }
 
         #endregion

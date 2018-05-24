@@ -48,6 +48,7 @@
             return new List<ChatCommand>
             {
                 // New command classes must be added in here.
+                new CommandHelp(),
                 new CommandScan(),
                 new CommandScanIgnore(),
                 new CommandScanTrack(),

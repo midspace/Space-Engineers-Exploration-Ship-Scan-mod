@@ -244,7 +244,7 @@
 
                                 foreach (var entityId in entityIds)
                                 {
-                                    var trackEntity = settings.ScanListGpsEntities.FirstOrDefault(t => t.Entities.Contains(entityId));
+                                    var trackEntity = settings.ScanListGpsEntities.FirstOrDefault(t => t.Entities.Any(e => e == entityId));
                                     if (trackEntity != null && trackEntity.GpsHash != 0)
                                     {
                                         settings.ScanListGpsEntities.Remove(trackEntity);

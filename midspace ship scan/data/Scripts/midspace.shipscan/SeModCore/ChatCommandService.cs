@@ -280,7 +280,7 @@
 
                         // Exception handling to prevent any crash in the ChatCommand's reaching the user.
                         // Additional information for developers
-                        if (MainChatCommandLogic.Instance.ExperimentalCreatorList.Contains(steamId))
+                        if (MainChatCommandLogic.Instance.ExperimentalCreatorList.Any(e => e == steamId))
                         {
                             MyAPIGateway.Utilities.SendMissionScreen(steamId, $"Error in {command.Value.Name}", "Input: ", messageText, ex.ToString());
                             TextLogger.WriteGameLog($"##Mod## {MainChatCommandLogic.Instance.ModName} Exception caught. Message: {ex}");
@@ -346,7 +346,7 @@
         public static bool HasRight(ulong steamId, ChatCommand command)
         {
             if (command.HasFlag(ChatCommandAccessibility.Experimental))
-                return MainChatCommandLogic.Instance.ExperimentalCreatorList.Contains(steamId) && command.Security <= UserSecurity;
+                return MainChatCommandLogic.Instance.ExperimentalCreatorList.Any(e => e == steamId) && command.Security <= UserSecurity;
 
             return command.Security <= UserSecurity;
         }
